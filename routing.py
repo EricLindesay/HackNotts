@@ -50,9 +50,11 @@ def initialise_blocks(nodes, inputs, outputs):
             i_l.append(j_l)
         blocks.append(i_l)
 
+    step_size = width // len(inputs)
+    start_offset = step_size // 2
     for ind, input in enumerate(inputs):
-        blocks[0][ind * 2][0] = Block(input.id, INPUT, input)
-        blocks[0][ind * 2][1] = Block(input.wire * -1, INPUT, input)
+        blocks[0][ind * step_size + start_offset][0] = Block(input.id, INPUT, input)
+        blocks[0][ind * step_size + start_offset][1] = Block(input.wire * -1, INPUT, input)
 
     return blocks
 
@@ -103,9 +105,12 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     blocks = initialise_blocks(nodes, inputs, outputs)
     add_gates(blocks, nodes)
 
+    step_size = len(blocks[0]) // len(outputs)
+    start_offset = step_size // 2
+    print(step_size, start_offset)
     for i, output in enumerate(outputs):
-        blocks[len(blocks) - 1][i * 2][0] = Block(output.id, OUTPUT, output)
-        blocks[len(blocks) - 1][i * 2][1] = Block(output.wire, OUTPUT, output)
+        blocks[len(blocks) - 1][i * step_size + start_offset][0] = Block(output.id, OUTPUT, output)
+        blocks[len(blocks) - 1][i * step_size + start_offset][1] = Block(output.wire, OUTPUT, output)
 
     print_blocks(blocks, 1)
     # dijkstras(blocks, [0, 0], [[6,2], [6,8]])
@@ -124,8 +129,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         print(f"Doing dijkstra on {node}: {start}, {goals}")
         dijkstras(blocks, start, goals)
 
-    print_blocks(blocks, 1)
-
+    return blocks
 
 def print_blocks(blocks, layer=0):
     for i in blocks:
@@ -276,7 +280,10 @@ def dijkstras(blocks, initial_node, goals):
     # Now backtrack from the goal to try to get the best route, then put the redstone on that route
     # if elevation changes, make sure to mark it as a VIA
     # We prefer straight lines
+    requires_repeaters = []  # a list of coordinates. These coordinates are redstone dust which requires a repeater
+
     for goal in goals:
+        wire_length: int = 0
         current_node = [goal[0], goal[1], 0]
         # Find the adjacent ones to get the best
         prev_direction = []
@@ -313,15 +320,22 @@ def dijkstras(blocks, initial_node, goals):
 
             # Work out whether this is a via
             print(f"Update block {next_node}")
+            type_id = blocks[initial_node[0]][initial_node[1]][1].id
             if current_node[0] == next_node[0] and current_node[1] == next_node[1] and current_node[2] != next_node[2]:
                 if current_node[2] > next_node[2]:
                     blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_UP
                 if current_node[2] < next_node[2] and not (next_node[0] == goal[0] and next_node[1] == goal[1]):
                     blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_DOWN
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
+                wire_length = 0
             else:
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = REDSTONE
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 0
+                wire_length += 1
+                if wire_length >= 15:
+                    if type_id not in requires_repeaters:
+                        requires_repeaters.append((next_node[0], next_node[1], next_node[2] + 1))
+                    wire_length = 0
 
             current_node = next_node
 
