@@ -35,7 +35,7 @@
         },
         "$abc$101$auto$blifparse.cc:371:parse_blif$103": {
           "hide_name": 1,
-          "type": "AND",
+          "type": "NAND",
           "parameters": {
           },
           "attributes": {
@@ -53,7 +53,7 @@
         },
         "$abc$101$auto$blifparse.cc:371:parse_blif$104": {
           "hide_name": 1,
-          "type": "XOR",
+          "type": "OR",
           "parameters": {
           },
           "attributes": {
@@ -71,7 +71,25 @@
         },
         "$abc$101$auto$blifparse.cc:371:parse_blif$105": {
           "hide_name": 1,
-          "type": "XOR",
+          "type": "AND",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 8 ],
+            "Y": [ 9 ]
+          }
+        },
+        "$abc$101$auto$blifparse.cc:371:parse_blif$106": {
+          "hide_name": 1,
+          "type": "AND",
           "parameters": {
           },
           "attributes": {
@@ -84,7 +102,43 @@
           "connections": {
             "A": [ 5 ],
             "B": [ 7 ],
-            "Y": [ 9 ]
+            "Y": [ 10 ]
+          }
+        },
+        "$abc$101$auto$blifparse.cc:371:parse_blif$107": {
+          "hide_name": 1,
+          "type": "NOR",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 7 ],
+            "Y": [ 11 ]
+          }
+        },
+        "$abc$101$auto$blifparse.cc:371:parse_blif$108": {
+          "hide_name": 1,
+          "type": "OR",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 11 ],
+            "Y": [ 12 ]
           }
         },
         "$auto$simplemap.cc:420:simplemap_dff$51": {
@@ -121,7 +175,7 @@
           },
           "connections": {
             "C": [ 2 ],
-            "D": [ 8 ],
+            "D": [ 9 ],
             "Q": [ 4 ]
           }
         },
@@ -140,7 +194,7 @@
           },
           "connections": {
             "C": [ 2 ],
-            "D": [ 9 ],
+            "D": [ 12 ],
             "Q": [ 5 ]
           }
         }
@@ -148,14 +202,32 @@
       "netnames": {
         "$0\\count[2:0]": {
           "hide_name": 1,
-          "bits": [ 6, 8, 9 ],
+          "bits": [ 6, 9, 12 ],
           "attributes": {
             "src": "test.v:7"
+          }
+        },
+        "$abc$101$new_n11_": {
+          "hide_name": 1,
+          "bits": [ 10 ],
+          "attributes": {
+          }
+        },
+        "$abc$101$new_n12_": {
+          "hide_name": 1,
+          "bits": [ 11 ],
+          "attributes": {
           }
         },
         "$abc$101$new_n8_": {
           "hide_name": 1,
           "bits": [ 7 ],
+          "attributes": {
+          }
+        },
+        "$abc$101$new_n9_": {
+          "hide_name": 1,
+          "bits": [ 8 ],
           "attributes": {
           }
         },

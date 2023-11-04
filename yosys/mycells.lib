@@ -39,13 +39,6 @@ library(demo) {
     pin(Y) { direction: output;
              function: "(A+B)"; }
   }
-  cell(XOR) {
-    area: 4;
-    pin(A) { direction: input; }
-    pin(B) { direction: input; }
-    pin(Y) { direction: output;
-             function: "A^B"; }
-  }
   
   cell(DFF) {
     area: 18;
