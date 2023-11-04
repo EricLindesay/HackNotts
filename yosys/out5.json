@@ -1,0 +1,481 @@
+{
+  "creator": "Yosys 0.9 (git sha1 1979e0b)",
+  "modules": {
+    "counter": {
+      "attributes": {
+        "src": "test.v:2"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "reset": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "up_down": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "load": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "count": {
+          "direction": "output",
+          "bits": [ 6, 7, 8 ]
+        }
+      },
+      "cells": {
+        "$auto$simplemap.cc:277:simplemap_mux$61": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 10 ]
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_mux$62": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 12 ]
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_mux$63": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_mux$65": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:11"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15 ],
+            "B": [ 16 ],
+            "S": [ 4 ],
+            "Y": [ 11 ]
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_mux$66": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:11"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17 ],
+            "B": [ 18 ],
+            "S": [ 4 ],
+            "Y": [ 13 ]
+          }
+        },
+        "$auto$simplemap.cc:420:simplemap_dff$67": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:7"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 10 ],
+            "Q": [ 6 ]
+          }
+        },
+        "$auto$simplemap.cc:420:simplemap_dff$68": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:7"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 12 ],
+            "Q": [ 7 ]
+          }
+        },
+        "$auto$simplemap.cc:420:simplemap_dff$69": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:7"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 14 ],
+            "Q": [ 8 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$107": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:263"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ "1" ],
+            "Y": [ 9 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$108": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:263"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "B": [ 6 ],
+            "Y": [ 15 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$109": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:263"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 21 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$141": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:262"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ "1" ],
+            "Y": [ 19 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$142": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:262"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ "1" ],
+            "Y": [ 20 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$510": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:12|<techmap.v>:263"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 6 ],
+            "Y": [ 16 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$511": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:12|<techmap.v>:263"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 22 ],
+            "Y": [ 18 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$639": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:260|<techmap.v>:221"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "B": [ 6 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$723": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:260|<techmap.v>:221"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 23 ],
+            "Y": [ 21 ]
+          }
+        },
+        "$auto$simplemap.cc:85:simplemap_bitop$781": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "test.v:12|<techmap.v>:260|<techmap.v>:221"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 6 ],
+            "Y": [ 22 ]
+          }
+        }
+      },
+      "netnames": {
+        "$0\\count[2:0]": {
+          "hide_name": 1,
+          "bits": [ 10, 12, 14 ],
+          "attributes": {
+            "src": "test.v:7"
+          }
+        },
+        "$add$test.v:12$2_Y": {
+          "hide_name": 1,
+          "bits": [ 9, 16, 18, 24, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "test.v:12",
+            "unused_bits": "3"
+          }
+        },
+        "$procmux$5_Y": {
+          "hide_name": 1,
+          "bits": [ 9, 11, 13 ],
+          "attributes": {
+          }
+        },
+        "$sub$test.v:14$3_Y": {
+          "hide_name": 1,
+          "bits": [ 9, 15, 17, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25 ],
+          "attributes": {
+            "src": "test.v:14",
+            "unused_bits": "3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
+          }
+        },
+        "$techmap$add$test.v:12$2.$auto$alumacc.cc:474:replace_alu$58.lcu.g": {
+          "hide_name": 1,
+          "bits": [ 6, 22, 24, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "test.v:12|<techmap.v>:260|<techmap.v>:203",
+            "unused_bits": "2"
+          }
+        },
+        "$techmap$sub$test.v:14$3.$auto$alumacc.cc:474:replace_alu$55.lcu.g": {
+          "hide_name": 1,
+          "bits": [ 6, 21, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26 ],
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:260|<techmap.v>:203",
+            "unused_bits": "2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
+          }
+        },
+        "$techmap$sub$test.v:14$3.$auto$alumacc.cc:490:replace_alu$56": {
+          "hide_name": 1,
+          "bits": [ 6, 19, 20, "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" ],
+          "attributes": {
+          }
+        },
+        "$techmap$techmap$sub$test.v:14$3.$auto$alumacc.cc:474:replace_alu$55.lcu.$and$<techmap.v>:221$242_Y": {
+          "hide_name": 1,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "test.v:14|<techmap.v>:260|<techmap.v>:221"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "test.v:4"
+          }
+        },
+        "count": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8 ],
+          "attributes": {
+            "src": "test.v:5"
+          }
+        },
+        "load": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "test.v:4"
+          }
+        },
+        "reset": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "test.v:4"
+          }
+        },
+        "up_down": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "test.v:4"
+          }
+        }
+      }
+    }
+  }
+}

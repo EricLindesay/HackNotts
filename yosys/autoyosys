@@ -1,0 +1,9 @@
+read_verilog test.v
+read_verilog -lib mycells.v
+hierarchy -check
+
+synth -flatten
+dfflibmap -liberty mycells.lib
+abc -liberty mycells.lib
+opt -full
+json -o opt6.json
