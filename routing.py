@@ -196,7 +196,7 @@ def dijkstras(blocks, initial_node, goals):
             for k in range(len(visited[0][0])):
                 blocks_k = k + 1
                 # Block off the other redstone
-                if blocks[i][j][blocks_k].block_type == REDSTONE or blocks[i][j][blocks_k].block_type == VIA:
+                if blocks[i][j][blocks_k].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
                     print(f"Redstone blocking {i} {j} {k}")
                     visited[i][j][k] = True
                     to_visit -= 1
@@ -255,18 +255,18 @@ def dijkstras(blocks, initial_node, goals):
             if next_node[0] == initial_node[0] and next_node[1] == initial_node[1] and next_node[2] == 0:
                 break
 
-            if blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type == REDSTONE:
-                break
-
-            if blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type == VIA:
+            if blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
                 break
 
             # If you go down, set it as a via instead
 
             # Work out whether this is a via
             print(f"Update block {next_node}")
-            if current_node[0] == next_node[0] and current_node[1] == next_node[1] and abs(current_node[2] - next_node[2]):
-                blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA
+            if current_node[0] == next_node[0] and current_node[1] == next_node[1] and current_node[2] != next_node[2]:
+                if current_node[2] > next_node[2]:
+                    blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_UP
+                if current_node[2] < next_node[2]:
+                    blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_DOWN
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
             else:
                 blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type = REDSTONE

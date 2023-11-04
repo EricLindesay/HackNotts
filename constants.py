@@ -5,10 +5,11 @@ NOR = 3
 NAND = 4
 DFF = 5
 REDSTONE = 6
-VIA = 7
-INPUT = 8
-OUTPUT = 9
-GATE_INPUT = 10
+VIA_UP = 7
+VIA_DOWN = 8
+INPUT = 9
+OUTPUT = 10
+GATE_INPUT = 11
 
 string_constant = {"AND": AND,
                    "OR": OR,
@@ -17,7 +18,6 @@ string_constant = {"AND": AND,
                    "NAND": NAND,
                    "DFF": DFF,
                    "REDSTONE": REDSTONE,
-                   "VIA": VIA
                    }
 
 constant_string = {AND: "AND",
@@ -27,5 +27,4 @@ constant_string = {AND: "AND",
                    NAND: "NAND",
                    DFF: "DFF",
                    REDSTONE: "REDSTONE",
-                   VIA: "VIA",
                    }
