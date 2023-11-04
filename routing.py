@@ -1,3 +1,4 @@
+from parser import Node
 # Get the number of inputs
 
 # Get the number of outputs
@@ -7,6 +8,7 @@
 
 inputs = 3
 outputs = 2
+nodes: list[Node] = []
 
 
 blocks = [[[]]]
