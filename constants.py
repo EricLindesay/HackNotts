@@ -4,6 +4,10 @@ NOT = 2
 NOR = 3
 NAND = 4
 DFF = 5
+REDSTONE = 6
+VIAS = 7
+INPUT = 8
+OUTPUT = 9
 
 string_constant = {"AND": AND,
                    "OR": OR,
@@ -11,6 +15,8 @@ string_constant = {"AND": AND,
                    "NOR": NOR,
                    "NAND": NAND,
                    "DFF": DFF,
+                   "REDSTONE": REDSTONE,
+                   "VIAS": VIAS
                    }
 
 constant_string = {AND: "AND",
@@ -19,4 +25,6 @@ constant_string = {AND: "AND",
                    NOR: "NOR",
                    NAND: "NAND",
                    DFF: "DFF",
+                   REDSTONE: "REDSTONE",
+                   VIAS: "VIAS",
                    }
