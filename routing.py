@@ -22,11 +22,24 @@ class Block:
         self.occupied = False
 
 
-def initialise_blocks(inputs):
+def initialise_blocks(nodes, inputs, outputs):
     blocks = []
-    for i in range(0, 30):
+    n: int = ceil(sqrt(len(nodes)))
+    input_width = len(inputs) * 2 - 1
+    output_width = len(outputs) * 2 - 1
+    gate_width = n * 3 + (n - 1) * 5
+    width = max(input_width, output_width, gate_width)
+    # one for input, one for output. We want 5 gap between them
+    # n * 4, they are 4 long, need 5 gap between them
+
+    actual_nodes = n
+    while abs(len(nodes) - actual_nodes) <= 0:
+        actual_nodes -= 1
+    height = 2 + actual_nodes * 4 + (actual_nodes + 1) * 5
+
+    for i in range(0, height):
         i_l = []
-        for j in range(0, 30):
+        for j in range(0, width):
             j_l = []
             for k in range(0, 3):
                 j_l.append(Block(-1, -1, -1))
@@ -76,7 +89,7 @@ def add_gates(blocks, nodes):
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     print(inputs)
 
-    blocks = initialise_blocks(inputs)
+    blocks = initialise_blocks(nodes, inputs, outputs)
     add_gates(blocks, nodes)
 
     for i, output in enumerate(outputs):
@@ -89,12 +102,13 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
 
 def print_blocks(blocks, layer=0):
     for i in blocks:
+        line: str = ""
         for j in i:
             if (j[layer].id == -1):
-                print(" ", end='')
+                line += " "
             else:
-                print(abs(j[layer].id), end='')
-        print()
+                line += str(abs(j[layer].id))
+        print(line)
 
 
 # blocks is area to traverse, initial node is start and goals is a list
@@ -113,43 +127,6 @@ def dijkstras(blocks, initial_node, goals):
     distance = [[[math.inf for k in range(len(blocks[0][0])-1)]for j in range(len(blocks[0]))]for i in range(len(blocks))]
     distance[initial_node[0]][initial_node[1]][0] = 0
     
-
-
-
-
-
-output: Output = Output()
-output.id = 0
-
-outputs: list[Output] = [output]
-
-i0: Input = Input()
-i0.id = 0
-
-i1: Input = Input()
-i1.id = 1
-
-i2: Input = Input()
-i2.id = 2
-
-inputs: list[Input] = [i0, i1, i2]
-
-n0: Node = Node()
-n0.id = 0
-n0.node_type = AND
-n0.outputs = [1]
-
-n1: Node = Node()
-n1.id = 1
-n1.node_type = OR
-n1.outputs = [1, 2]
-
-n2: Node = Node()
-n2.id = 2
-n2.node_type = NAND
-n2.outputs = [output]
-
-nodes: list[Node] = [n0, n1, n2]
 
 if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
