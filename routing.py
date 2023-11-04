@@ -50,7 +50,7 @@ def initialise_blocks(nodes, inputs, outputs):
 
     for ind, input in enumerate(inputs):
         blocks[0][ind * 2][0] = Block(input.id, INPUT, input)
-        blocks[0][ind * 2][1] = Block(input.wire, INPUT, input)
+        blocks[0][ind * 2][1] = Block(input.wire * -1, INPUT, input)
 
     return blocks
 
@@ -103,8 +103,10 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         blocks[len(blocks) - 1][i * 2][1] = Block(output.wire, OUTPUT, output)
 
     print_blocks(blocks, 1)
-    dijkstras(blocks, [0, 0], [[6,2]])
-    print_blocks(blocks, 1)
+    goals = goal_finder(blocks, -5)
+    print(goals)
+    # dijkstras(blocks, [0, 0], [[6,2], [6,8]])
+    # print_blocks(blocks, 1)
 
 
 def print_blocks(blocks, layer=0):
@@ -117,6 +119,14 @@ def print_blocks(blocks, layer=0):
                 line += str(abs(j[layer].id))
         print(line)
 
+
+def goal_finder(blocks, goalGateNum):
+    goals = []
+    for x in range(len(blocks)):
+        for y in range(len(blocks[0])):
+            if blocks[x][y][1].id == goalGateNum * -1:
+                goals.append([x, y])
+    return goals
 
 # blocks is area to traverse, initial node is start and goals is a list
 def dijkstras(blocks, initial_node, goals):
