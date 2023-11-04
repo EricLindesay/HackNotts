@@ -1,15 +1,15 @@
 from constants import *
 
 
-
 class Node:
     type_ = "Node"
-    node_type: int = 0
+    node_type: int = 0  # AND, NOT, NOR
     id: int = 0
-    input_wires = []
+    input_wires: list[int] = []
     output_wire: int = 0
+
     def __str__(self):
-        return f"{self.type_}<{self.id=}, {constant_string[self.node_type]}, outputs={self.outputs}, inputs={self.inputs}"
+        return f"{self.type_}<{self.id=}, {constant_string[self.node_type]}, input_wires={self.input_wires}, output={self.output_wire}>"
 
 
 class Output:
@@ -17,7 +17,7 @@ class Output:
     id: int = 0
 
     def __str__(self):
-        return f"{self.type_}<{self.id=}"
+        return f"{self.type_}<{self.id=}>"
 
 
 class Input:
@@ -25,4 +25,4 @@ class Input:
     id: int = 0
 
     def __str__(self):
-        return f"{self.type_}<{self.id=}"
+        return f"{self.type_}<{self.id=}>"
