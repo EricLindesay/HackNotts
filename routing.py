@@ -1,8 +1,12 @@
+import math
+
 from classes import *
 from constants import *
 from math import ceil, sqrt
 from gates import *
 from parse_input import read_input
+
+
 # Get the number of inputs
 
 # Get the number of outputs
@@ -30,8 +34,8 @@ def initialise_blocks(inputs):
         blocks.append(i_l)
 
     for ind, input in enumerate(inputs):
-        blocks[0][ind*2][0] = Block(input.id, INPUT, input)
-        blocks[0][ind*2][1] = Block(input.wire, INPUT, input)
+        blocks[0][ind * 2][0] = Block(input.id, INPUT, input)
+        blocks[0][ind * 2][1] = Block(input.wire, INPUT, input)
 
     return blocks
 
@@ -43,12 +47,12 @@ def add_gates(blocks, nodes):
     # Do a 5 block gap between each important thing
 
     for i, node in enumerate(nodes):
-        divd: int = i//n  # the x coord
+        divd: int = i // n  # the x coord
         modd: int = i % n  # the y coord
-        start_x = divd*9 + 6
+        start_x = divd * 9 + 6
         end_x = start_x + 4  # the gates are 4 long
 
-        start_y = modd*8
+        start_y = modd * 8
         end_y = start_y + 3  # the gates are 3 wide
 
         # +4 because the things are 4 long, + 1 for rounding error
@@ -76,10 +80,11 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     add_gates(blocks, nodes)
 
     for i, output in enumerate(outputs):
-        blocks[len(blocks)-1][i*2][0] = Block(output.id, OUTPUT, output)
-        blocks[len(blocks)-1][i*2][1] = Block(output.wire, OUTPUT, output)
+        blocks[len(blocks) - 1][i * 2][0] = Block(output.id, OUTPUT, output)
+        blocks[len(blocks) - 1][i * 2][1] = Block(output.wire, OUTPUT, output)
 
-    print_blocks(blocks, 1)
+    # print_blocks(blocks, 1)
+    dijkstras(blocks, 0, 0)
 
 
 def print_blocks(blocks, layer=0):
@@ -91,7 +96,25 @@ def print_blocks(blocks, layer=0):
                 print(abs(j[layer].id), end='')
         print()
 
-def dijkstras(blocks):
+
+# blocks is area to traverse, initial node is start and goals is a list
+def dijkstras(blocks, initial_node, goals):
+    i = 0
+    unvisited_nodes = []
+    # Unvisited nodes list generation
+    for layer in blocks:
+        if i == 0:
+            i += 1
+            continue
+        for x in layer:
+            for y in layer:
+                unvisited_nodes.append((x, y, i))
+    # instantiate max value for size of blocks
+    distance = [[[math.inf for k in range(len(blocks[0][0])-1)]for j in range(len(blocks[0]))]for i in range(len(blocks))]
+    distance[initial_node[0]][initial_node[1]][0] = 0
+    
+
+
 
 
 
@@ -99,7 +122,6 @@ output: Output = Output()
 output.id = 0
 
 outputs: list[Output] = [output]
-
 
 i0: Input = Input()
 i0.id = 0
@@ -111,7 +133,6 @@ i2: Input = Input()
 i2.id = 2
 
 inputs: list[Input] = [i0, i1, i2]
-
 
 n0: Node = Node()
 n0.id = 0
@@ -135,3 +156,4 @@ if __name__ == "__main__":
     inputs = read_input().read_inputs("./yosys/opt6.json")
     outputs = read_input().read_outputs("./yosys/opt6.json")
     route(nodes, inputs, outputs)
+
