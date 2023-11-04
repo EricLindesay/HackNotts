@@ -24,13 +24,15 @@ class Block:
     def __str__(self):
         return f"Block<{self.id=}, {self.block_type=}>"
 
+
 def initialise_blocks(nodes, inputs, outputs):
+    padding_x = 3
     blocks = []
     n: int = ceil(sqrt(len(nodes)))
     input_width = len(inputs) * 2 - 1
     output_width = len(outputs) * 2 - 1
     gate_width = n * 3 + (n - 1) * 5
-    width = max(input_width, output_width, gate_width)
+    width = max(input_width, output_width, gate_width) + 2 * padding_x
     # one for input, one for output. We want 5 gap between them
     # n * 4, they are 4 long, need 5 gap between them
 
@@ -57,6 +59,8 @@ def initialise_blocks(nodes, inputs, outputs):
 
 def add_gates(blocks, nodes):
     # Gates are 3x4
+    padding_x = 3
+
     n: int = ceil(sqrt(len(nodes)))  # this is the grid size, e.g. 2x2 grid
 
     # Do a 5 block gap between each important thing
@@ -67,7 +71,7 @@ def add_gates(blocks, nodes):
         start_x = divd * 9 + 6
         end_x = start_x + 4  # the gates are 4 long
 
-        start_y = modd * 8
+        start_y = modd * 8 + padding_x
         end_y = start_y + 3  # the gates are 3 wide
 
         # +4 because the things are 4 long, + 1 for rounding error
@@ -80,11 +84,12 @@ def add_gates(blocks, nodes):
 
         # Add the input and output markers
         gate: Gate = gates[node.node_type]
+        print(gate)
         for i, gate_input in enumerate(gate.input_locations):
-            blocks[start_x + gate_input[0]][start_y +
-                                            gate_input[1]][1].id = node.input_wires[i]
-            blocks[start_x + gate_input[0]][start_y +
-                                            gate_input[1]][1].block_type = GATE_INPUT
+            blocks[start_x + gate_input[1]][start_y +
+                                            gate_input[0]][1].id = node.input_wires[i]
+            blocks[start_x + gate_input[1]][start_y +
+                                            gate_input[0]][1].block_type = GATE_INPUT
 
         blocks[start_x + gate.output_location[1]][start_y +
                                                   gate.output_location[0]][1].id = -1 * node.output_wire
@@ -112,7 +117,6 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         print(f"Doing dijkstra on {input}: {start}, {goals}")
         dijkstras(blocks, start, goals)
 
-
     print("Nodes")
     for node in nodes:
         goals = goal_finder(blocks, node.output_wire)
@@ -122,11 +126,12 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
 
     print_blocks(blocks, 1)
 
+
 def print_blocks(blocks, layer=0):
     for i in blocks:
         line: str = ""
         for j in i:
-            if (j[layer].id == -1):
+            if j[layer].id == -1:
                 line += " "
             else:
                 line += str(abs(j[layer].id))
@@ -140,6 +145,7 @@ def goal_finder(blocks, goalGateNum):
             if blocks[x][y][1].id == goalGateNum:
                 goals.append([x, y])
     return goals
+
 
 def initial_finder(blocks, initialGateNum):
     for x in range(len(blocks)):
@@ -165,7 +171,7 @@ def dijkstras(blocks, initial_node, goals):
     distance = [[[math.inf for k in range(len(blocks[0][0]) - 1)] for j in range(len(blocks[0]))] for i in
                 range(len(blocks))]
     visited = [[[False for k in range(len(blocks[0][0]) - 1)] for j in range(len(blocks[0]))] for i in
-                range(len(blocks))]
+               range(len(blocks))]
 
     to_visit = len(visited) * len(visited[0]) * len(visited[0][0])
     directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
@@ -246,7 +252,7 @@ def dijkstras(blocks, initial_node, goals):
                             min_node = [i, j, k]
 
         if len(min_node) == 0:
-            break;  # You have seen everything
+            break  # You have seen everything
 
         visited[min_node[0]][min_node[1]][min_node[2]] = True
         to_visit -= 1
@@ -257,7 +263,8 @@ def dijkstras(blocks, initial_node, goals):
             newZ = min_node[2] + direction[2]
             if is_valid(distance, newX, newY, newZ) and not visited[newX][newY][newZ]:
                 # update the distances
-                distance[newX][newY][newZ] = min(distance[min_node[0]][min_node[1]][min_node[2]]+1, distance[newX][newY][newZ])
+                distance[newX][newY][newZ] = min(distance[min_node[0]][min_node[1]][min_node[2]] + 1,
+                                                 distance[newX][newY][newZ])
 
     for d in distance:
         print(d)
@@ -268,24 +275,38 @@ def dijkstras(blocks, initial_node, goals):
 
     # Now backtrack from the goal to try to get the best route, then put the redstone on that route
     # if elevation changes, make sure to mark it as a VIA
+    # We prefer straight lines
     for goal in goals:
         current_node = [goal[0], goal[1], 0]
         # Find the adjacent ones to get the best
+        prev_direction = []
         while not (current_node[0] == initial_node[0] and current_node[1] == initial_node[1]):
             best_dist = 0
             next_node = []
-            for direction in directions:
+            new_directions = []
+
+            # We want to favour going in straight lines, so keep on going in the previous direction
+            if prev_direction:
+                new_directions.append(prev_direction)
+
+            for d in directions:
+                if d not in new_directions:
+                    new_directions.append(d)
+
+            for direction in new_directions:
                 newX = current_node[0] + direction[0]
                 newY = current_node[1] + direction[1]
                 newZ = current_node[2] + direction[2]
-                if is_valid(distance, newX, newY, newZ) and (len(next_node) == 0 or distance[newX][newY][newZ] < best_dist):
+                if is_valid(distance, newX, newY, newZ) and (
+                        len(next_node) == 0 or distance[newX][newY][newZ] < best_dist):
                     best_dist = distance[newX][newY][newZ]
                     next_node = [newX, newY, newZ]
+                    prev_direction = direction
 
             if next_node[0] == initial_node[0] and next_node[1] == initial_node[1] and next_node[2] == 0:
                 break
 
-            if blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
+            if blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
                 break
 
             # If you go down, set it as a via instead
@@ -299,8 +320,8 @@ def dijkstras(blocks, initial_node, goals):
                     blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_DOWN
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
             else:
-                blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type = REDSTONE
-                blocks[next_node[0]][next_node[1]][next_node[2]+1].id = 0
+                blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = REDSTONE
+                blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 0
 
             current_node = next_node
 
@@ -308,6 +329,7 @@ def dijkstras(blocks, initial_node, goals):
     print_blocks(blocks, 1)
     print("Layer 2")
     print_blocks(blocks, 2)
+
 
 def is_valid(distance, x, y, z):
     return not (x >= len(distance) or x < 0 or y >= len(distance[0]) or y < 0 or z >= len(distance[0][0]) or z < 0)
