@@ -91,6 +91,9 @@ def print_blocks(blocks, layer=0):
                 print(abs(j[layer].id), end='')
         print()
 
+def dijkstras(blocks):
+
+
 
 output: Output = Output()
 output.id = 0
