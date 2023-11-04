@@ -1,5 +1,6 @@
 # HackNotts
 Inspiration taken from [this project](https://github.com/itsFrank/MinecraftHDL).
+[flowchart](flowchart.png)
 Components:
 
 ## Parse Input
