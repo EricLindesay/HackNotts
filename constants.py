@@ -10,6 +10,7 @@ VIA_DOWN = 8
 INPUT = 9
 OUTPUT = 10
 GATE_INPUT = 11
+GATE_OUTPUT = 11
 
 string_constant = {"AND": AND,
                    "OR": OR,

@@ -89,7 +89,7 @@ def add_gates(blocks, nodes):
         blocks[start_x + gate.output_location[1]][start_y +
                                                   gate.output_location[0]][1].id = -1 * node.output_wire
         blocks[start_x + gate.output_location[1]][start_y +
-                                                  gate.output_location[0]][1].block_type = GATE_INPUT
+                                                  gate.output_location[0]][1].block_type = GATE_OUTPUT
 
 
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
@@ -109,7 +109,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     for input in inputs:
         goals = goal_finder(blocks, input.wire)
         start = initial_finder(blocks, input.wire)
-        print(f"Doing dijkstra on {start}, {goals}")
+        print(f"Doing dijkstra on {input}: {start}, {goals}")
         dijkstras(blocks, start, goals)
 
 
@@ -117,6 +117,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     for node in nodes:
         goals = goal_finder(blocks, node.output_wire)
         start = initial_finder(blocks, node.output_wire)
+        print(f"Doing dijkstra on {node}: {start}, {goals}")
         dijkstras(blocks, start, goals)
 
     print_blocks(blocks, 1)
@@ -147,6 +148,7 @@ def initial_finder(blocks, initialGateNum):
                 return [x, y]
     return []
 
+
 # blocks is area to traverse, initial node is start and goals is a list
 def dijkstras(blocks, initial_node, goals):
     i = 0
@@ -166,33 +168,53 @@ def dijkstras(blocks, initial_node, goals):
                 range(len(blocks))]
 
     to_visit = len(visited) * len(visited[0]) * len(visited[0][0])
-    directions = [[1, 0, 0], [0, 0, 1], [0, 0, -1], [-1, 0, 0], [0, 1, 0], [0, -1, 0]]
+    directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
 
     # Block off redstone and other pings
-    print(blocks[6][0][1])
-    print(initial_node, goals)
+    print(initial_node, goals, blocks[initial_node[0]][initial_node[1]][1])
     for i in range(len(blocks)):
         for j in range(len(blocks[0])):
             # Block off the other inputs
             if blocks[i][j][1].id != -1:
                 print(f"{i}, {j}, 1 : {blocks[i][j][1]}")
 
-            dont_block_same_id: bool = ((blocks[i][j][1].block_type == GATE_INPUT or blocks[i][j][1].block_type == OUTPUT) and abs(blocks[i][j][1].id) != abs(blocks[initial_node[0]][initial_node[1]][1].id))
-            blockable_type: bool = (dont_block_same_id or blocks[i][j][1].block_type == INPUT)
-            is_start_node: bool = (i == initial_node[0] and j == initial_node[1])
-            if blockable_type and not is_start_node:
-                visited[i][j][0] = True
-                to_visit -= 1
-                for direction in directions:
-                    newX = i + direction[0]
-                    newY = j + direction[1]
-                    if is_valid(distance, newX, newY, 0):
-                        visited[newX][newY][0] = True
-                        to_visit -= 1
+            if i == initial_node[0] and j == initial_node[1]:
+                # You don't want to block yourself off
+                continue
+
+            # We want to block INPUTs and gate outputs. As well as GATE_INPUTS of different types and OUTPUTS of different type
+            # We also don't want to block air
+            block = blocks[i][j][1]
+            if block.block_type == -1:
+                continue
+
+            # We don't want to block GATE_INPUTs if they have the same id as the one we are going to
+            if abs(block.id) == abs(blocks[initial_node[0]][initial_node[1]][1].id):
+                continue
+
+            # We don't want to block OUTPUTs if they have the same id as the one we are going to
+            # if block.block_type == OUTPUT and abs(block.id) == abs(blocks[initial_node[0]][initial_node[1]][1].id):
+            #     continue
+
+            # dont_block_same_id: bool = ((blocks[i][j][1].block_type == GATE_INPUT or blocks[i][j][1].block_type == OUTPUT)
+            #                             and abs(blocks[i][j][1].id) != abs(blocks[initial_node[0]][initial_node[1]][1].id))
+            # blockable_type: bool = (dont_block_same_id or blocks[i][j][1].block_type == INPUT)
+            # if blockable_type:
+
+            print(f"\tDENIED")
+
+            visited[i][j][0] = True
+            to_visit -= 1
+            for direction in directions:
+                newX = i + direction[0]
+                newY = j + direction[1]
+                if is_valid(distance, newX, newY, 0):
+                    visited[newX][newY][0] = True
+                    to_visit -= 1
 
     # Block off other redstone blocks
-    for i in range(len(blocks)):
-        for j in range(len(blocks[0])):
+    for i in range(len(visited)):
+        for j in range(len(visited[0])):
             for k in range(len(visited[0][0])):
                 blocks_k = k + 1
                 # Block off the other redstone
@@ -208,8 +230,10 @@ def dijkstras(blocks, initial_node, goals):
                             to_visit -= 1
 
     distance[initial_node[0]][initial_node[1]][0] = 0
+    for v in visited:
+        print(v)
     # Do dijkstras
-    while to_visit > 0:
+    while True:
         min_node = []  # 0, 0, 0
         min_dist = 0
         for i in range(len(visited)):
@@ -220,6 +244,10 @@ def dijkstras(blocks, initial_node, goals):
                         if len(min_node) == 0 or distance[i][j][k] < min_dist:
                             min_dist = distance[i][j][k]
                             min_node = [i, j, k]
+
+        if len(min_node) == 0:
+            break;  # You have seen everything
+
         visited[min_node[0]][min_node[1]][min_node[2]] = True
         to_visit -= 1
 
@@ -234,10 +262,12 @@ def dijkstras(blocks, initial_node, goals):
     for d in distance:
         print(d)
 
+    for v in visited:
+        print(v)
     # A list of coordinates for each goal
 
     # Now backtrack from the goal to try to get the best route, then put the redstone on that route
-    # if elevation changes, make sure to mark it as a VIAS
+    # if elevation changes, make sure to mark it as a VIA
     for goal in goals:
         current_node = [goal[0], goal[1], 0]
         # Find the adjacent ones to get the best
@@ -265,7 +295,7 @@ def dijkstras(blocks, initial_node, goals):
             if current_node[0] == next_node[0] and current_node[1] == next_node[1] and current_node[2] != next_node[2]:
                 if current_node[2] > next_node[2]:
                     blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_UP
-                if current_node[2] < next_node[2]:
+                if current_node[2] < next_node[2] and not (next_node[0] == goal[0] and next_node[1] == goal[1]):
                     blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_DOWN
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
             else:
@@ -274,7 +304,9 @@ def dijkstras(blocks, initial_node, goals):
 
             current_node = next_node
 
+    print("Layer 1")
     print_blocks(blocks, 1)
+    print("Layer 2")
     print_blocks(blocks, 2)
 
 def is_valid(distance, x, y, z):
