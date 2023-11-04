@@ -15,14 +15,16 @@ class Node:
 class Output:
     type_ = "Output"
     id: int = 0
+    wire: int = 0
 
     def __str__(self):
-        return f"{self.type_}<{self.id=}>"
+        return f"{self.type_}<{self.id=}, {self.wire=}>"
 
 
 class Input:
     type_ = "Input"
     id: int = 0
+    wire: int = 0
 
     def __str__(self):
-        return f"{self.type_}<{self.id=}>"
+        return f"{self.type_}<{self.id=}, {self.wire=}>"
