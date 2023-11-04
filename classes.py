@@ -9,3 +9,11 @@ class Node:
 
     # list of integers representing the nodes that connect to this node
     inputs: list[int] = []
+
+
+class Output:
+    id: int = 0
+
+
+class Input:
+    id: int = 0
