@@ -1,6 +1,7 @@
 from classes import *
 from constants import *
 from math import ceil, sqrt
+from gates import *
 # Get the number of inputs
 
 # Get the number of outputs
@@ -13,6 +14,7 @@ class Block:
         self.id: int = id
         self.block_type: int = b_type
         self.node = node
+        self.occupied = False
 
 
 def initialise_blocks(inputs):
@@ -21,7 +23,7 @@ def initialise_blocks(inputs):
         i_l = []
         for j in range(0, 30):
             j_l = []
-            for k in range(0, 2):
+            for k in range(0, 3):
                 j_l.append(Block(-1, -1, -1))
             i_l.append(j_l)
         blocks.append(i_l)
@@ -32,36 +34,54 @@ def initialise_blocks(inputs):
     return blocks
 
 
+def add_gates(blocks, nodes):
+    # Gates are 3x4
+    n: int = ceil(sqrt(len(nodes)))  # this is the grid size, e.g. 2x2 grid
+
+    # Do a 5 block gap between each important thing
+
+    for i, node in enumerate(nodes):
+        divd: int = i//n  # the x coord
+        modd: int = i % n  # the y coord
+        start_x = divd*9 + 6
+        end_x = start_x + 4  # the gates are 4 long
+
+        start_y = modd*8
+        end_y = start_y + 3  # the gates are 3 wide
+
+        # +4 because the things are 4 long, + 1 for rounding error
+        for x in range(start_x, end_x):
+            # +3 because the things are 3 wide, +1 for rounding error
+            for y in range(start_y, end_y):
+                block = Block(node.id, node.node_type, node)
+                block.occupied = True
+                blocks[x][y][0] = block
+
+        # Add the input and output markers
+        gate: Gate = gates[node.node_type]
+        for i, gate_input in enumerate(gate.input_locations):
+            blocks[start_x + gate_input[0]][start_y +
+                                            gate_input[1]][1] = node.input_wires[i]
+
+        blocks[start_x + gate.output_location[0]][start_y +
+                                                  gate.output_location[1]] = -1 * node.output_wire
+
+
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     print(inputs)
 
     blocks = initialise_blocks(inputs)
-
-    # Gates are 3x4
-    n: int = ceil(sqrt(len(inputs)))  # this is the grid size, e.g. 2x2 grid
-
-    # Do a 5 block gap between each important thing
-    for nodes_done, node in enumerate(nodes):
-        divd: int = nodes_done//n  # the x coord
-        modd: int = nodes_done % n  # the y coord
-        # +4 because the things are 4 long, + 1 for rounding error
-        for x in range(divd*9 + 6, divd*9 + 6 + 4):
-            # +3 because the things are 3 wide, +1 for rounding error
-            for y in range(modd*8, modd*8 + 3):
-                block = Block(node.id, node.node_type, node)
-                blocks[x][y][0] = block
-        nodes_done += 1
-
-    print_blocks(blocks)
+    add_gates(blocks, nodes)
 
 
-def print_blocks(blocks):
+
+def print_blocks(blocks, layer=0):
     for i in blocks:
         for j in i:
-            if (j[0].id == -1):
+            if (j[layer].id == -1):
                 print(" ", end='')
             else:
-                print(j[0].block_type, end='')
+                print(j[layer].id, end='')
         print()
 
 
@@ -100,5 +120,6 @@ n2.outputs = [output]
 
 nodes: list[Node] = [n0, n1, n2]
 
+if __name__ == "__main__":
 
-route(nodes, inputs, outputs)
+    route(nodes, inputs, outputs)
