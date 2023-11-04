@@ -12,7 +12,7 @@ class Node:
     inputs: list[int] = []
 
     def __str__(self):
-        return f"{self.type_}<{self.id=}, {constant_string[self.node_type]}, outputs={self.outputs}"
+        return f"{self.type_}<{self.id=}, {constant_string[self.node_type]}, outputs={self.outputs}, inputs={self.inputs}"
 
 
 class Output:
