@@ -1,6 +1,6 @@
 # HackNotts
 Inspiration taken from [this project](https://github.com/itsFrank/MinecraftHDL).
-[flowchart](flowchart.png)
+(flowchart.png)
 Components:
 
 ## Parse Input
@@ -16,7 +16,7 @@ This is where we define the node (logic gates), output and input classes and def
 This is a dictionary defining the inputs and outputs of the logic gates defined in the constants class.
 
 ## Routing
-[wires](https://i.kym-cdn.com/photos/images/original/002/515/835/d68.jpg)
+(https://i.kym-cdn.com/photos/images/original/002/515/835/d68.jpg)
 This file has two parts to it in order to produce a 3d array of gate locations and wire routing between them.
 
 ### Placement
