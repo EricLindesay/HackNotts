@@ -2,6 +2,7 @@ from classes import *
 from constants import *
 from math import ceil, sqrt
 from gates import *
+from parse_input import read_input
 # Get the number of inputs
 
 # Get the number of outputs
@@ -30,6 +31,7 @@ def initialise_blocks(inputs):
 
     for ind, input in enumerate(inputs):
         blocks[0][ind*2][0] = Block(input.id, INPUT, input)
+        blocks[0][ind*2][1] = Block(input.wire, INPUT, input)
 
     return blocks
 
@@ -61,10 +63,10 @@ def add_gates(blocks, nodes):
         gate: Gate = gates[node.node_type]
         for i, gate_input in enumerate(gate.input_locations):
             blocks[start_x + gate_input[0]][start_y +
-                                            gate_input[1]][1] = node.input_wires[i]
+                                            gate_input[1]][1].id = node.input_wires[i]
 
         blocks[start_x + gate.output_location[0]][start_y +
-                                                  gate.output_location[1]] = -1 * node.output_wire
+                                                  gate.output_location[1]][1].id = -1 * node.output_wire
 
 
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
@@ -122,5 +124,7 @@ n2.outputs = [output]
 nodes: list[Node] = [n0, n1, n2]
 
 if __name__ == "__main__":
-
+    nodes = read_input().read_gates("./yosys/opt6.json")
+    inputs = read_input().read_inputs("./yosys/opt6.json")
+    outputs = read_input().read_outputs("./yosys/opt6.json")
     route(nodes, inputs, outputs)
