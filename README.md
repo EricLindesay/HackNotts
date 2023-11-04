@@ -1,5 +1,6 @@
 # HackNotts
-Components
+Inspiration taken from [this project](https://github.com/itsFrank/MinecraftHDL).
+Components:
 
 ## Parse Input
 This file is where we take the input from the verilog file conversion to the json files and output them as a predefined gates with nested lists of inputs and outputs.
