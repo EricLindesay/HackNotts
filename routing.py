@@ -105,6 +105,9 @@ def print_blocks(blocks, layer=0):
                 line += str(abs(j[layer].id))
         print(line)
 
+def dijkstras(blocks):
+
+
 
 if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
