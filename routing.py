@@ -121,6 +121,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         dijkstras(blocks, start, goals)
 
     print_blocks(blocks, 1)
+    return blocks
 
 def print_blocks(blocks, layer=0):
     for i in blocks:
