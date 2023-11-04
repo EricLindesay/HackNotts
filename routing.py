@@ -44,9 +44,9 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     for nodes_done, node in enumerate(nodes):
         divd: int = nodes_done//n  # the x coord
         modd: int = nodes_done % n  # the y coord
-        # +4 because the things are 4 long, + 1 for ronuding error
+        # +4 because the things are 4 long, + 1 for rounding error
         for x in range(divd*9 + 6, divd*9 + 6 + 4):
-            # +3 because the things are 3 wide, +1 for roungind error
+            # +3 because the things are 3 wide, +1 for rounding error
             for y in range(modd*8, modd*8 + 3):
                 block = Block(node.id, node.node_type, node)
                 blocks[x][y][0] = block
