@@ -65,8 +65,8 @@ def add_gates(blocks, nodes):
             blocks[start_x + gate_input[0]][start_y +
                                             gate_input[1]][1].id = node.input_wires[i]
 
-        blocks[start_x + gate.output_location[0]][start_y +
-                                                  gate.output_location[1]][1].id = -1 * node.output_wire
+        blocks[start_x + gate.output_location[1]][start_y +
+                                                  gate.output_location[0]][1].id = -1 * node.output_wire
 
 
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
@@ -75,6 +75,11 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     blocks = initialise_blocks(inputs)
     add_gates(blocks, nodes)
 
+    for i, output in enumerate(outputs):
+        blocks[len(blocks)-1][i*2][0] = Block(output.id, OUTPUT, output)
+        blocks[len(blocks)-1][i*2][1] = Block(output.wire, OUTPUT, output)
+
+    print_blocks(blocks, 1)
 
 
 def print_blocks(blocks, layer=0):
@@ -83,7 +88,7 @@ def print_blocks(blocks, layer=0):
             if (j[layer].id == -1):
                 print(" ", end='')
             else:
-                print(j[layer].id, end='')
+                print(abs(j[layer].id), end='')
         print()
 
 
