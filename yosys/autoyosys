@@ -1,4 +1,4 @@
-read_verilog test2.v
+read_verilog test3.v
 read_verilog -lib mycells.v
 hierarchy -check
 
