@@ -8,6 +8,7 @@ REDSTONE = 6
 VIAS = 7
 INPUT = 8
 OUTPUT = 9
+TEMP = 10
 
 string_constant = {"AND": AND,
                    "OR": OR,

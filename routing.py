@@ -21,6 +21,8 @@ class Block:
         self.node = node
         self.occupied = False
 
+    def __str__(self):
+        return f"Block<{self.id=}, {self.block_type=}>"
 
 def initialise_blocks(nodes, inputs, outputs):
     blocks = []
@@ -81,9 +83,13 @@ def add_gates(blocks, nodes):
         for i, gate_input in enumerate(gate.input_locations):
             blocks[start_x + gate_input[0]][start_y +
                                             gate_input[1]][1].id = node.input_wires[i]
+            blocks[start_x + gate_input[0]][start_y +
+                                            gate_input[1]][1].block_type = TEMP
 
         blocks[start_x + gate.output_location[1]][start_y +
                                                   gate.output_location[0]][1].id = -1 * node.output_wire
+        blocks[start_x + gate.output_location[1]][start_y +
+                                                  gate.output_location[0]][1].block_type = TEMP
 
 
 def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
@@ -96,8 +102,9 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         blocks[len(blocks) - 1][i * 2][0] = Block(output.id, OUTPUT, output)
         blocks[len(blocks) - 1][i * 2][1] = Block(output.wire, OUTPUT, output)
 
-    # print_blocks(blocks, 1)
-    dijkstras(blocks, 0, 0)
+    print_blocks(blocks, 1)
+    dijkstras(blocks, [0, 0], [[6,2]])
+    print_blocks(blocks, 1)
 
 
 def print_blocks(blocks, layer=0):
@@ -124,13 +131,112 @@ def dijkstras(blocks, initial_node, goals):
             for y in layer:
                 unvisited_nodes.append((x, y, i))
     # instantiate max value for size of blocks
-    distance = [[[math.inf for k in range(len(blocks[0][0])-1)]for j in range(len(blocks[0]))]for i in range(len(blocks))]
+    distance = [[[math.inf for k in range(len(blocks[0][0]) - 1)] for j in range(len(blocks[0]))] for i in
+                range(len(blocks))]
+    visited = [[[False for k in range(len(blocks[0][0]) - 1)] for j in range(len(blocks[0]))] for i in
+                range(len(blocks))]
+
+    to_visit = len(visited) * len(visited[0]) * len(visited[0][0])
+    directions = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0, -1], [0, -1, 0], [-1, 0, 0]]
+
+    # Block off redstone and other pings
+    print(blocks[6][0][1])
+    print(initial_node, goals)
+    for i in range(len(blocks)):
+        for j in range(len(blocks[0])):
+            # Block off the other inputs
+            if blocks[i][j][1].id != -1:
+                print(f"{i}, {j}, 1 : {blocks[i][j][1]}")
+            if ((blocks[i][j][1].block_type == TEMP and abs(blocks[i][j][1].id) != abs(blocks[initial_node[0]][initial_node[1]][1].id)) or blocks[i][j][1].block_type == INPUT or blocks[i][j][1].block_type == OUTPUT) and not (i == initial_node[0] and j == initial_node[1]):
+                visited[i][j][0] = True
+                to_visit -= 1
+                for direction in directions:
+                    newX = i + direction[0]
+                    newY = j + direction[1]
+                    if is_valid(distance, newX, newY, 0):
+                        visited[newX][newY][0] = True
+                        to_visit -= 1
+
+    # Block off other redstone blocks
+    for i in range(len(blocks)):
+        for j in range(len(blocks[0])):
+            for k in range(len(visited[0][0])):
+                blocks_k = k + 1
+                # Block off the other redstone
+                if blocks[i][j][blocks_k].block_type == REDSTONE:
+                    visited[i][j][k] = True
+                    to_visit -= 1
+                    for direction in directions:
+                        newX = initial_node[0] + direction[0]
+                        newY = initial_node[1] + direction[1]
+                        if is_valid(distance, newX, newY, k):
+                            visited[newX][newY][k] = True
+                            to_visit -= 1
+
     distance[initial_node[0]][initial_node[1]][0] = 0
-    
+    while to_visit > 0:
+        min_node = []  # 0, 0, 0
+        min_dist = 0
+        for i in range(len(visited)):
+            for j in range(len(visited[0])):
+                for k in range(len(visited[0][0])):
+                    if not visited[i][j][k]:
+                        # if there is no node yet, or the distance is better, choose this node
+                        if len(min_node) == 0 or distance[i][j][k] < min_dist:
+                            min_dist = distance[i][j][k]
+                            min_node = [i, j, k]
+        visited[min_node[0]][min_node[1]][min_node[2]] = True
+        to_visit -= 1
+
+        for direction in directions:
+            newX = min_node[0] + direction[0]
+            newY = min_node[1] + direction[1]
+            newZ = min_node[2] + direction[2]
+            if is_valid(distance, newX, newY, newZ) and not visited[newX][newY][newZ]:
+                # update the distances
+                distance[newX][newY][newZ] = min(distance[min_node[0]][min_node[1]][min_node[2]]+1, distance[newX][newY][newZ])
+
+    for d in distance:
+        print(d)
+
+    # A list of coordinates for each goal
+
+    # Now backtrack from the goal to try to get the best route, then put the redstone on that route
+    # if elevation changes, make sure to mark it as a VIAS
+    for goal in goals:
+        current_node = [goal[0], goal[1], 0]
+        # Find the adjacent ones to get the best
+        while not (current_node[0] == initial_node[0] and current_node[1] == initial_node[1]):
+            best_dist = 0
+            next_node = []
+            for direction in directions:
+                newX = current_node[0] + direction[0]
+                newY = current_node[1] + direction[1]
+                newZ = current_node[2] + direction[2]
+                if is_valid(distance, newX, newY, newZ) and (len(next_node) == 0 or distance[newX][newY][newZ] < best_dist):
+                    best_dist = distance[newX][newY][newZ]
+                    next_node = [newX, newY, newZ]
+
+            if next_node[0] == initial_node[0] and next_node[1] == initial_node[1] and next_node[2] == 0:
+                break
+
+            if blocks[next_node[0]][next_node[1]][next_node[2]].block_type == REDSTONE:
+                continue
+
+            # If you go down, set it as a vias instead
+            print(f"Update block {next_node}")
+            blocks[next_node[0]][next_node[1]][next_node[2]+1].block_type = REDSTONE
+            blocks[next_node[0]][next_node[1]][next_node[2]+1].id = 0
+            current_node = next_node
+
+    print_blocks(blocks, 1)
+
+def is_valid(distance, x, y, z):
+    return not (x >= len(distance) or x < 0 or y >= len(distance[0]) or y < 0 or z >= len(distance[0][0]) or z < 0)
+
 
 if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
     inputs = read_input().read_inputs("./yosys/opt6.json")
     outputs = read_input().read_outputs("./yosys/opt6.json")
     route(nodes, inputs, outputs)
-
