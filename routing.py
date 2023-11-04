@@ -51,9 +51,9 @@ def add_gates(blocks, nodes):
         start_y = modd*8
         end_y = start_y + 3  # the gates are 3 wide
 
-        # +4 because the things are 4 long, + 1 for ronuding error
+        # +4 because the things are 4 long, + 1 for rounding error
         for x in range(start_x, end_x):
-            # +3 because the things are 3 wide, +1 for roungind error
+            # +3 because the things are 3 wide, +1 for rounding error
             for y in range(start_y, end_y):
                 block = Block(node.id, node.node_type, node)
                 block.occupied = True
@@ -75,7 +75,6 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     blocks = initialise_blocks(inputs)
     add_gates(blocks, nodes)
 
-    print_blocks(blocks, layer=1)
 
 
 def print_blocks(blocks, layer=0):
