@@ -1,7 +1,6 @@
-# array of nodes, index of which is the id
-
 
 class Node:
+    type_ = "Node"
     node_type: int = 0
     id: int = 0
     # list of integers representing the nodes this node connects to
@@ -12,8 +11,10 @@ class Node:
 
 
 class Output:
+    type_ = "Output"
     id: int = 0
 
 
 class Input:
+    type_ = "Input"
     id: int = 0
