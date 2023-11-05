@@ -236,6 +236,9 @@ def dijkstras(blocks, initial_node, goals):
                         if is_valid(distance, newX, newY, k):
                             visited[newX][newY][k] = True
 
+    for goal in goals:
+        visited[goal[0]][goal[1]][2] = True
+
     for i in range(len(visited)):
         for j in range(len(visited[0])):
             if visited[i][j][0]:
@@ -325,10 +328,10 @@ def dijkstras(blocks, initial_node, goals):
             if current_node[0] == next_node[0] and current_node[1] == next_node[1] and current_node[2] != next_node[2]:
                 if current_node[2] > next_node[2]:
                     blocks[next_node[0]][next_node[1]
-                                         ][next_node[2] + 1].block_type = VIA_UP
-                if current_node[2] < next_node[2] and not (next_node[0] == goal[0] and next_node[1] == goal[1]):
-                    blocks[next_node[0]][next_node[1]
                                          ][next_node[2] + 1].block_type = VIA_DOWN
+                if current_node[2] < next_node[2]:
+                    blocks[next_node[0]][next_node[1]
+                                         ][next_node[2] + 1].block_type = VIA_UP
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
                 wire_length = 0
             else:
