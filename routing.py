@@ -181,7 +181,6 @@ def populate_repeaters(blocks, requires_repeaters):
             # Go through this circuit, counting the wire length. When you get to 15, step backwards until there is a valid repeater position
             # Do we need to go deeper?
             block = blocks[coord[0]][coord[1]][coord[2]]
-            print(f"{wire_length} We have found a {block}")
             if block.block_type == VIA_UP:
                 coord[2] -= 1
                 wire_length = 0
@@ -199,7 +198,6 @@ def populate_repeaters(blocks, requires_repeaters):
             next_wire = new_next
             wire_length += 1
             if wire_length >= 15:
-                print("Limit exceeded")
                 # loop backwards until you find a balid position for a repeaty
                 while prev_wire:
                     # go to this previous wire
@@ -224,11 +222,11 @@ def populate_repeaters(blocks, requires_repeaters):
 
                         if next_wire[1] - coord[1] == 1:
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_EAST
+                                                       ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif next_wire[1] - coord[1] == -1:
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_WEST
+                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         prev_wire.append(coord)
                         coord = next_wire
@@ -242,11 +240,11 @@ def populate_repeaters(blocks, requires_repeaters):
 
                         if next_wire[0] - coord[0] == 1:
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_SOUTH
+                                                       ].block_type = REPEATER_NORTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif next_wire[0] - coord[0] == -1:
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_NORTH
+                                                       ].block_type = REPEATER_SOUTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         prev_wire.append(coord)
                         coord = next_wire
