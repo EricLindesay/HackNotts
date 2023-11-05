@@ -290,7 +290,7 @@ def test_via_ups(blocks):
                         newX = i + direction[0]
                         newY = j + direction[1]
                         newZ = k
-                        if is_valid(blocks, newX, newY, newZ) and is_redstone_ish(blocks[newX][newY][newZ].block_type):
+                        if is_valid(blocks, newX, newY, newZ) and is_redstone_ish(blocks[newX][newY][newZ]):
                             red_neighbours += 1
                     if red_neighbours >= 2:
                         raise ValueError("There is redstone through a VIA_UP")
