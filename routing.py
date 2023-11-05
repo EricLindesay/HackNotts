@@ -242,6 +242,30 @@ def dijkstras(blocks, initial_node, goals):
     for goal in goals:
         visited[goal[0]][goal[1]][1] = True
 
+    # Try all of the source's neighbours
+    # Try all of the goal's neighbours
+    # If they are all blocked, die
+    impossible = True
+    for direction in directions:
+        newX = initial_node[0] + direction[0]
+        newY = initial_node[1] + direction[1]
+        newZ = direction[2]
+        if is_valid(distance, newX, newY, newZ) and not visited[newX][newY][newZ]:
+            # update the distances
+            impossible = False
+
+    for goal in goals:
+        for direction in directions:
+            newX = goal[0] + direction[0]
+            newY = goal[1] + direction[1]
+            newZ = direction[2]
+            if is_valid(distance, newX, newY, newZ) and not visited[newX][newY][newZ]:
+                # update the distances
+                impossible = False
+
+    if impossible:
+        raise IndexError("This is an impossible layout")
+
     for i in range(len(visited)):
         for j in range(len(visited[0])):
             if visited[i][j][0]:
@@ -358,7 +382,7 @@ def dijkstras(blocks, initial_node, goals):
     print_blocks(blocks, 1)
     print_blocks(blocks, 2)
 
-    return
+    # ALso have to check repeaters if you have a T junction. Right now it can place a repeater on the T
 
     horizontal_directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]]
     # Go through the list of repeaters.
@@ -385,6 +409,8 @@ def dijkstras(blocks, initial_node, goals):
         coord = next_wire
 
         while True:
+            if not coord:
+                break
             # Go through this circuit, counting the wire length. When you get to 15, step backwards until there is a valid repeater position
             # Do we need to go deeper?
             block = blocks[coord[0]][coord[1]][coord[2]]
@@ -418,6 +444,11 @@ def dijkstras(blocks, initial_node, goals):
                     # Make sure the x or y coordinates of each of these wires are the same
                     if next_wire[0] == coord[0] and coord[0] == last_wire[0]:
                         # repeate
+                        if is_valid(blocks, coord[0], coord[1]+1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]):
+                            continue
+                        if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
+                            continue
+
                         if next_wire[1] - coord[1] == 1:
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_EAST
@@ -431,6 +462,11 @@ def dijkstras(blocks, initial_node, goals):
                         wire_length = 1
                         break
                     if next_wire[1] == coord[1] and coord[1] == last_wire[1]:
+                        if is_valid(blocks, coord[0], coord[1]+1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]):
+                            continue
+                        if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
+                            continue
+
                         if next_wire[0] - coord[0] == 1:
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_SOUTH
@@ -514,6 +550,11 @@ if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
     inputs = read_input().read_inputs("./yosys/opt6.json")
     outputs = read_input().read_outputs("./yosys/opt6.json")
+
     while True:
-        random.shuffle(nodes)
-        route(nodes, inputs, outputs)
+        try:
+            random.shuffle(nodes)
+            route(nodes, inputs, outputs)
+            break
+        except Exception:
+            pass
