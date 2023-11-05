@@ -3,8 +3,11 @@ Inspiration taken from [this project](https://github.com/itsFrank/MinecraftHDL).
 ![flowchart](flowchart.png)
 Components:
 
+## yosys
+The yosys library converts a given verilog logic gate file into an equivalent JSON file using the defined logic gates in the mycells.v and mycells.lib files.
+
 ## Parse Input
-This file is where we take the input from the verilog file conversion to the json files and output them as a predefined gates with nested lists of inputs and outputs.
+This file is where we take the input from the verilog file conversion to the JSON files and output them as a predefined gates with nested lists of inputs and outputs.
 
 ## Constants
 This is where we define the types of blocks required for our logic gates along with the names of the logic gates.
