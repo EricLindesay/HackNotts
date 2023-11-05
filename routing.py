@@ -237,8 +237,9 @@ def dijkstras(blocks, initial_node, goals):
                             visited[newX][newY][k] = True
 
     # Don't allow an up into an up
+    visited[initial_node[0]][initial_node[1]][1] = True
+
     for goal in goals:
-        visited[goal[0]][goal[1]][0] = True
         visited[goal[0]][goal[1]][1] = True
 
     for i in range(len(visited)):
