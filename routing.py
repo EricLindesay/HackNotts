@@ -236,7 +236,9 @@ def dijkstras(blocks, initial_node, goals):
                         if is_valid(distance, newX, newY, k):
                             visited[newX][newY][k] = True
 
+    # Don't allow an up into an up
     for goal in goals:
+        visited[goal[0]][goal[1]][0] = True
         visited[goal[0]][goal[1]][1] = True
 
     for i in range(len(visited)):
