@@ -281,7 +281,10 @@ def dijkstras(blocks, initial_node, goals):
     # Now backtrack from the goal to try to get the best route, then put the redstone on that route
     # if elevation changes, make sure to mark it as a VIA
     # We prefer straight lines
-    requires_repeaters = []  # a list of coordinates. These coordinates are redstone dust which requires a repeater
+    requires_repeaters = []  # a list of coordinates. These coordinates are initial nodes which you should step through
+                             # Step through this node until you find a place where you require a repeater
+                             # Then step backwards until you find a place to put it
+                             # Then continue stepping through until you find another place to put the repeater, or the end
 
     for goal in goals:
         wire_length: int = 0
@@ -335,16 +338,56 @@ def dijkstras(blocks, initial_node, goals):
                 wire_length += 1
                 if wire_length >= 15:
                     if type_id not in requires_repeaters:
-                        requires_repeaters.append((next_node[0], next_node[1], next_node[2] + 1))
+                        requires_repeaters.append([()])
                     wire_length = 0
 
             current_node = next_node
+
+
+    # Go through the list of repeaters.
+    for repeater in requires_repeaters:
+        # Go through this circuit, counting the wire length. When you get to 15, step backwards until there is a valid repeater position
+        wire_length = 0
+        coord = repeater
+        # Do we need to go deeper?
+        block = blocks[coord[0]][coord[1]][coord[2]]
+        if block.block_type == VIA_UP:
+            coord[2] -= 1
+            wire_length = 0
+        elif block.block_type == VIA_DOWN:
+            coord[2] += 1
+            wire_length = 0
+
+        if not block.block_type == REDSTONE:
+            raise Exception("THIS SHOULD NEVER NOT BE REDSTONE")
+
+        wire_length += 1
+        # is high enough?
+
+        next_wire = None
+        horizontal_directions = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+        for direction in horizontal_directions:
+            newX = coord[0] + direction[0]
+            newY = coord[1] + direction[1]
+            newZ = coord[2] + direction[2]
+            if not is_valid(distance, newX, newY, newZ):
+                continue
+
+            # Is this redstone/valid?
+            if is_redstone_ish(block[newX][newY][newZ]):
+                next_wire = [newX, newY, newZ]
+                break
+            # Make sure we aren't cycling
+            # Is this the end node?
 
     print("Layer 1")
     print_blocks(blocks, 1)
     print("Layer 2")
     print_blocks(blocks, 2)
 
+
+def is_redstone_ish(block):
+    return block.block_type == REDSTONE or block.block_type == VIA_UP or block.block_type == VIA_DOWN
 
 def is_valid(distance, x, y, z):
     return not (x >= len(distance) or x < 0 or y >= len(distance[0]) or y < 0 or z >= len(distance[0][0]) or z < 0)
