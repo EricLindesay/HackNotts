@@ -138,6 +138,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
 
 
 def print_blocks(blocks, layer=0):
+    print(f"Layer {layer}")
     for i in blocks:
         line: str = ""
         for j in i:
@@ -183,7 +184,6 @@ def dijkstras(blocks, initial_node, goals):
     visited = [[[False for k in range(len(blocks[0][0]) - 1)] for j in range(len(blocks[0]))] for i in
                range(len(blocks))]
 
-    to_visit = len(visited) * len(visited[0]) * len(visited[0][0])
     directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0],
                   [0, -1, 0], [0, 0, 1], [0, 0, -1]]
 
@@ -216,13 +216,11 @@ def dijkstras(blocks, initial_node, goals):
             # if blockable_type:
 
             visited[i][j][0] = True
-            to_visit -= 1
             for direction in directions:
                 newX = i + direction[0]
                 newY = j + direction[1]
                 if is_valid(distance, newX, newY, 0):
                     visited[newX][newY][0] = True
-                    to_visit -= 1
 
     # Block off other redstone blocks
     for i in range(len(visited)):
@@ -232,13 +230,19 @@ def dijkstras(blocks, initial_node, goals):
                 # Block off the other redstone
                 if blocks[i][j][blocks_k].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
                     visited[i][j][k] = True
-                    to_visit -= 1
                     for direction in directions:
                         newX = i + direction[0]
                         newY = j + direction[1]
                         if is_valid(distance, newX, newY, k):
                             visited[newX][newY][k] = True
-                            to_visit -= 1
+
+    for i in range(len(visited)):
+        for j in range(len(visited[0])):
+            if visited[i][j][0]:
+                print(1, end='')
+            else:
+                print(0, end='')
+        print()
 
     distance[initial_node[0]][initial_node[1]][0] = 0
 
@@ -259,7 +263,6 @@ def dijkstras(blocks, initial_node, goals):
             break  # You have seen everything
 
         visited[min_node[0]][min_node[1]][min_node[2]] = True
-        to_visit -= 1
 
         for direction in directions:
             newX = min_node[0] + direction[0]
@@ -331,7 +334,8 @@ def dijkstras(blocks, initial_node, goals):
             else:
                 blocks[next_node[0]][next_node[1]
                                      ][next_node[2] + 1].block_type = REDSTONE
-                blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 0
+                blocks[next_node[0]][next_node[1]][next_node[2] +
+                                                   1].id = blocks[initial_node[0]][initial_node[1]][1].id
                 wire_length += 1
                 if wire_length >= 15:
                     if type_id not in requires_repeaters:
@@ -340,22 +344,23 @@ def dijkstras(blocks, initial_node, goals):
 
             current_node = next_node
 
-    print("Layer 1")
+    print_blocks(blocks, layer=1)
+    print_blocks(blocks, layer=2)
+
+    check_redstone_closeness(blocks)
+
     print_blocks(blocks, 1)
-    print("Layer 2")
     print_blocks(blocks, 2)
-    # print("Layer 3")
-    # print_blocks(blocks, 3)
 
     return
 
+    horizontal_directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0]]
     # Go through the list of repeaters.
     for repeater in requires_repeaters:
         wire_length = 0
         coord = repeater
         prev_wire = []
 
-        horizontal_directions = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
         next_wire = []
         # Do the initial handling of direction from the source
         for direction in horizontal_directions:
@@ -463,6 +468,34 @@ def dijkstras(blocks, initial_node, goals):
     print_blocks(blocks, 2)
 
 
+def check_redstone_closeness(blocks):
+    horizontal_directions = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+    # Detect for two adjacent redstonies which don't have the same id
+    # Loop through the entire
+    for k in range(len(blocks[0][0])):
+        for i in range(len(blocks)):
+            for j in range(len(blocks[0])):
+                if blocks[i][j][k].block_type != REDSTONE:
+                    continue
+
+                for direction in horizontal_directions:
+                    newX = i + direction[0]
+                    newY = j + direction[1]
+                    newZ = k + direction[2]
+                    # Make sure we aren't cycling
+                    if not is_valid(blocks, newX, newY, newZ):
+                        continue
+
+                    # Is this redstone?
+                    if blocks[newX][newY][newZ].block_type != REDSTONE:
+                        continue
+
+                    # Are they the same wire?
+                    if blocks[newX][newY][newZ].id != blocks[i][j][k].id:
+                        raise AssertionError(
+                            "Redstone too close together and clashing")
+
+
 def is_redstone_ish(block):
     return block.block_type == REDSTONE or block.block_type == VIA_UP or block.block_type == VIA_DOWN
 
@@ -475,5 +508,6 @@ if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
     inputs = read_input().read_inputs("./yosys/opt6.json")
     outputs = read_input().read_outputs("./yosys/opt6.json")
-    random.shuffle(nodes)
-    route(nodes, inputs, outputs)
+    while True:
+        random.shuffle(nodes)
+        route(nodes, inputs, outputs)
