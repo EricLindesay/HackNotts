@@ -507,11 +507,12 @@ def dijkstras(blocks, initial_node, goals):
                 if wire_length >= 15:
                     # Loop forwards until you can place a repeate
                     while len(prev_nodes) >= 2:
-                        # Replace the current block with air
-                        blocks[current_node[0]][current_node[1]
-                                                ][current_node[2]].block_type = -1
-                        blocks[current_node[0]][current_node[1]
-                                                ][current_node[2]].id = -1
+                        # If its redstone, replace it with air
+                        if blocks[current_node[0]][current_node[1]][current_node[2]].block_type == REDSTONE:
+                            blocks[current_node[0]][current_node[1]
+                                                    ][current_node[2]].block_type = -1
+                            blocks[current_node[0]][current_node[1]
+                                                    ][current_node[2]].id = -1
 
                         # Step back one
                         next_node = current_node
