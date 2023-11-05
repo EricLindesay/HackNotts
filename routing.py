@@ -258,7 +258,17 @@ def populate_repeaters(blocks, requires_repeaters):
                             continue
 
                         print(blocks[coord[0]][coord[1]][coord[2]].direction)
-                        if direction[0] == 1:
+                        if direction[1] == 1:
+                            print("\t\tPlace")
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_NORTH
+                            blocks[coord[0]][coord[1]][coord[2]].id = 2
+                        elif direction[1] == -1:
+                            print("\t\tPlace")
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_SOUTH
+                            blocks[coord[0]][coord[1]][coord[2]].id = 2
+                        elif direction[0] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_EAST
@@ -296,6 +306,16 @@ def populate_repeaters(blocks, requires_repeaters):
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_SOUTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
+                        elif direction[0] == 1:
+                            print("\t\tPlace")
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_EAST
+                            blocks[coord[0]][coord[1]][coord[2]].id = 2
+                        elif direction[0] == -1:
+                            print("\t\tPlace")
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_WEST
+                            blocks[coord[0]][coord[1]][coord[2]].id = 2
                         num_repeaters += 1
 
                         prev_wire.append(coord)
@@ -319,7 +339,6 @@ def populate_repeaters(blocks, requires_repeaters):
             next_wire = new_next
         print(num_repeaters)
     print(num_repeaters)
-# the index of the array to go home to
 
 
 def is_output_ish(block):
