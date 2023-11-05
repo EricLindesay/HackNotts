@@ -148,6 +148,17 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     print_blocks(blocks, 1)
     print_blocks(blocks, 2)
 
+    for i in range(len(blocks)):
+        for j in range(len(blocks[0])):
+            if blocks[i][j][1].block_type == REDSTONE:
+                if blocks[i][j][1].direction == [0, 0]:
+                    print(1, end='')
+                else:
+                    print(0, end='')
+            else:
+                print(" ", end='')
+        print()
+
     return blocks
 
 
