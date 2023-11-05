@@ -64,6 +64,10 @@ def initialise_blocks(nodes, inputs, outputs):
     return blocks
 
 
+horizontal_directions = [[1, 0, 0], [
+    0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+
+
 def add_gates(blocks, nodes):
     # Gates are 3x4
     n: int = ceil(sqrt(len(nodes)))  # this is the grid size, e.g. 2x2 grid
@@ -132,6 +136,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         dijkstras(blocks, start, goals)
 
     test_via_ups(blocks)
+    # print(requires_repeaters)
     populate_repeaters(blocks, requires_repeaters)
     check_redstone_closeness(blocks)
 
@@ -151,6 +156,7 @@ def populate_repeaters(blocks, requires_repeaters):
 
         next_wire = []
         # Do the initial handling of direction from the source
+        possible_directions = []
         for direction in horizontal_directions:
             newX = coord[0] + direction[0]
             newY = coord[1] + direction[1]
@@ -161,8 +167,14 @@ def populate_repeaters(blocks, requires_repeaters):
 
             # Is this redstone/valid?
             if is_redstone_ish(blocks[newX][newY][newZ]):
-                next_wire = [newX, newY, newZ]
-                break
+                possible_directions.append([newX, newY, newZ])
+
+        if len(possible_directions) == 1:
+            next_wire = possible_directions[0]
+        else:
+            p = find_home(blocks, coord, possible_directions)
+            coord = possible_directions[p]
+
         prev_wire.append(coord)
         coord = next_wire
 
@@ -219,9 +231,9 @@ def populate_repeaters(blocks, requires_repeaters):
                         wire_length = 1
                         break
                     if next_wire[1] == coord[1] and coord[1] == last_wire[1]:
-                        if is_valid(blocks, coord[0], coord[1]+1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]):
+                        if is_valid(blocks, coord[0]+1, coord[1], coord[2]) and is_redstone_ish(blocks[coord[0]+1][coord[1]][coord[2]]):
                             continue
-                        if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
+                        if is_valid(blocks, coord[0]-1, coord[1], coord[2]) and is_redstone_ish(blocks[coord[0]-1][coord[1]][coord[2]]):
                             continue
 
                         if next_wire[0] - coord[0] == 1:
@@ -239,7 +251,7 @@ def populate_repeaters(blocks, requires_repeaters):
 
             horizontal_directions = [[1, 0, 0], [
                 0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-            next_wire = []
+            possible_directions = []
             for direction in horizontal_directions:
                 newX = coord[0] + direction[0]
                 newY = coord[1] + direction[1]
@@ -250,7 +262,7 @@ def populate_repeaters(blocks, requires_repeaters):
 
                 # Is this redstone/valid?
                 if is_redstone_ish(blocks[newX][newY][newZ]):
-                    next_wire = [newX, newY, newZ]
+                    possible_directions.append([newX, newY, newZ])
                     break
                 if blocks[newX][newY][newZ].block_type in [GATE_INPUT, OUTPUT]:
                     next_wire = [newX, newY, newZ]
@@ -259,7 +271,54 @@ def populate_repeaters(blocks, requires_repeaters):
             if stop:
                 break
             prev_wire.append(coord)
-            coord = next_wire
+            if len(possible_directions) == 1:
+                coord = next_wire
+            else:
+                p = find_home(blocks, coord, possible_directions)
+                coord = possible_directions[p]
+
+# the index of the array to go home to
+
+
+def find_home(blocks, current_node, possible_directions) -> int:
+    for i, direction in enumerate(possible_directions):
+        if i == len(possible_directions) - 1:
+            return i  # you've elinimated the other ones, it must be this one
+
+        prev_node = current_node
+        coord = direction
+        stop = True
+        while stop:
+            # find neighbours
+            possible_directions = []
+            for direction in horizontal_directions:
+                newX = coord[0] + direction[0]
+                newY = coord[1] + direction[1]
+                newZ = coord[2] + direction[2]
+                # Make sure we aren't cycling
+                if not is_valid(blocks, newX, newY, newZ):
+                    continue
+
+                # Make sure that you aren't looking where you just were
+                if [newX, newY, newZ] == prev_node:
+                    continue
+
+                # Is this output ish or input ish?
+                # If its output ish, we have found the direction, return
+                # Otherwise, keep going
+                if is_output_ish(blocks[newX][newY][newZ]):
+                    return i
+                else:
+                    possible_directions.append([newX, newY, newZ])
+
+            branch = find_home(blocks, current_node, possible_directions)
+            if branch >= 0:
+                return branch
+    return -1
+
+
+def is_output_ish(block):
+    return block.block_type in [GATE_OUTPUT, INPUT, VIA_DOWN]
 
 
 def test_via_ups(blocks):
@@ -506,7 +565,7 @@ def dijkstras(blocks, initial_node, goals):
                 # The wire is now too long
                 if wire_length >= 15:
                     if type_id not in requires_repeaters:
-                        requires_repeaters.append(initial_node + [1])
+                        requires_repeaters.append([goal[0], goal[1], 1])
                     wire_length = 0
 
             prev_nodes.append(current_node)
