@@ -262,12 +262,12 @@ def populate_repeaters(blocks, requires_repeaters):
                         if t_direction[1] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_EAST
+                                                       ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif t_direction[1] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_WEST
+                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         num_repeaters += 1
 
