@@ -507,13 +507,18 @@ def dijkstras(blocks, initial_node, goals):
                 if wire_length >= 15:
                     # Loop forwards until you can place a repeate
                     while len(prev_nodes) >= 2:
+                        # Replace the current block with air
+                        blocks[current_node[0]][current_node[1]
+                                                ][current_node[2]].block_type = -1
+                        blocks[current_node[0]][current_node[1]
+                                                ][current_node[2]].id = -1
+
                         # Step back one
                         next_node = current_node
                         current_node = prev_nodes[-1]
                         prev_node = prev_nodes[-2]
 
                         prev_nodes = prev_nodes[:-1]  # remove the last node
-                        prev_node = prev_nodes[-2]
 
                         # Can we put a repeater here?
                         if next_node[0] == current_node[0] and current_node[0] == prev_node[0]:
