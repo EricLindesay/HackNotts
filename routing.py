@@ -14,8 +14,8 @@ from parse_input import read_input
 
 # Get the gates we need - put this in a nxn grid (as best as possible)
 LAYER_SIZE = 3
-PADDING_X = 2
-GAP = 7
+PADDING_X = 4
+GAP = 10
 WIRE_LENGTH = 10
 
 
@@ -145,6 +145,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
 
     print_blocks(blocks, 1)
     print_blocks(blocks, 2)
+    return blocks
 
 
 def populate_repeaters(blocks, requires_repeaters):
