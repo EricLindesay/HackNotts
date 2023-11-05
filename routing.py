@@ -132,7 +132,8 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         dijkstras(blocks, start, goals)
 
     test_via_ups(blocks)
-    populate_repeaters(blocks, requires_repeaters)
+    # populate_repeaters(blocks, requires_repeaters)
+    check_redstone_closeness(blocks)
 
     print_blocks(blocks, 1)
     print_blocks(blocks, 2)
@@ -452,6 +453,7 @@ def dijkstras(blocks, initial_node, goals):
     for goal in goals:
         wire_length: int = 0
         current_node = [goal[0], goal[1], 0]
+        prev_nodes = []
         # Find the adjacent ones to get the best
         prev_direction = []
         while not (current_node[0] == initial_node[0] and current_node[1] == initial_node[1]):
@@ -480,10 +482,8 @@ def dijkstras(blocks, initial_node, goals):
             if next_node[0] == initial_node[0] and next_node[1] == initial_node[1] and next_node[2] == 0:
                 break
 
-            if blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
+            if blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type in [REDSTONE, VIA_UP, VIA_DOWN, REPEATER_EAST, REPEATER_NORTH, REPEATER_SOUTH, REPEATER_WEST]:
                 break
-
-            # If you go down, set it as a via instead
 
             # Work out whether this is a via
             type_id = blocks[initial_node[0]][initial_node[1]][1].id
@@ -497,19 +497,74 @@ def dijkstras(blocks, initial_node, goals):
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
                 wire_length = 0
             else:
+                # It isn't a via
                 blocks[next_node[0]][next_node[1]
                                      ][next_node[2] + 1].block_type = REDSTONE
                 blocks[next_node[0]][next_node[1]][next_node[2] +
                                                    1].id = blocks[initial_node[0]][initial_node[1]][1].id
                 wire_length += 1
+                # The wire is now too long
                 if wire_length >= 15:
-                    if type_id not in requires_repeaters:
-                        requires_repeaters.append(initial_node + [1])
-                    wire_length = 0
+                    # Loop forwards until you can place a repeate
+                    while len(prev_nodes) >= 2:
+                        # Step back one
+                        next_node = current_node
+                        current_node = prev_nodes[-1]
+                        prev_node = prev_nodes[-2]
 
+                        prev_nodes = prev_nodes[:-1]  # remove the last node
+                        prev_node = prev_nodes[-2]
+
+                        # Can we put a repeater here?
+                        if next_node[0] == current_node[0] and current_node[0] == prev_node[0]:
+                            # Don't allow T junctions
+                            if is_valid(blocks, current_node[0], current_node[1]+1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]+1][current_node[2]]):
+                                continue
+                            if is_valid(blocks, current_node[0], current_node[1]-1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]-1][current_node[2]]):
+                                continue
+
+                            if next_node[1] - current_node[1] == 1:
+                                blocks[current_node[0]][current_node[1]][current_node[2]
+                                                                         ].block_type = REPEATER_EAST
+                                blocks[current_node[0]][current_node[1]
+                                                        ][current_node[2]].id = 2
+                            elif next_node[1] - current_node[1] == -1:
+                                blocks[current_node[0]][current_node[1]][current_node[2]
+                                                                         ].block_type = REPEATER_WEST
+                                blocks[current_node[0]][current_node[1]
+                                                        ][current_node[2]].id = 2
+                            # we put a repeater here, continue on
+                            prev_nodes.append(current_node)
+                            coord = next_node
+                            wire_length = 1
+                            break
+                        if next_node[1] == current_node[1] and current_node[1] == prev_node[1]:
+                            if is_valid(blocks, current_node[0], current_node[1]+1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]+1][current_node[2]]):
+                                continue
+                            if is_valid(blocks, current_node[0], current_node[1]-1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]-1][current_node[2]]):
+                                continue
+
+                            if next_node[0] - current_node[0] == 1:
+                                blocks[current_node[0]][current_node[1]][current_node[2]
+                                                                         ].block_type = REPEATER_SOUTH
+                                blocks[current_node[0]][current_node[1]
+                                                        ][current_node[2]].id = 2
+                            elif next_node[0] - current_node[0] == -1:
+                                blocks[current_node[0]][current_node[1]][current_node[2]
+                                                                         ].block_type = REPEATER_NORTH
+                                blocks[current_node[0]][current_node[1]
+                                                        ][current_node[2]].id = 2
+                            prev_nodes.append(current_node)
+                            current_node = next_node
+                            wire_length = 1
+                            break
+
+                    # if type_id not in requires_repeaters:
+                    #     requires_repeaters.append(initial_node + [1])
+                    # wire_length = 0
+
+            prev_nodes.append(current_node)
             current_node = next_node
-
-    check_redstone_closeness(blocks)
 
     # ALso have to check repeaters if you have a T junction. Right now it can place a repeater on the T
 
