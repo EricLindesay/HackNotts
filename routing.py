@@ -16,6 +16,7 @@ from parse_input import read_input
 LAYER_SIZE = 3
 PADDING_X = 3
 GAP = 7
+WIRE_LENGTH = 10
 
 
 class Block:
@@ -197,7 +198,7 @@ def populate_repeaters(blocks, requires_repeaters):
         while True:
             if not coord:
                 break
-            # Go through this circuit, counting the wire length. When you get to 15, step backwards until there is a valid repeater position
+            # Go through this circuit, counting the wire length. When you get to WIRE_LENGTH, step backwards until there is a valid repeater position
             # Do we need to go deeper?
 
             block = blocks[coord[0]][coord[1]][coord[2]]
@@ -217,8 +218,8 @@ def populate_repeaters(blocks, requires_repeaters):
 
             next_wire = new_next
             wire_length += 1
-            if wire_length >= 15:
-                print(f"Wire >= 15")
+            if wire_length >= WIRE_LENGTH:
+                print(f"Wire >= {WIRE_LENGTH}")
                 # loop backwards until you find a balid position for a repeaty
                 while prev_wire:
                     # go to this previous wire
@@ -249,12 +250,12 @@ def populate_repeaters(blocks, requires_repeaters):
                         if direction[0] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_WEST
+                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif direction[0] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_EAST
+                                                       ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         num_repeaters += 1
 
@@ -266,10 +267,10 @@ def populate_repeaters(blocks, requires_repeaters):
                         print("bottom")
                         print(is_valid(blocks, coord[0], coord[1]+1, coord[2]),
                               is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]))
-                        print(is_valid(blocks, coord[0], coord[1]-1, coord[2]),
-                              is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]))
                         if is_valid(blocks, coord[0], coord[1]+1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]):
                             continue
+                        print(is_valid(blocks, coord[0], coord[1]-1, coord[2]),
+                              is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]))
                         if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
                             continue
 
@@ -561,7 +562,7 @@ def dijkstras(blocks, initial_node, goals):
 
                 wire_length += 1
                 # The wire is now too long
-                if wire_length >= 15:
+                if wire_length >= WIRE_LENGTH:
                     if type_id not in requires_repeaters:
                         requires_repeaters.append(origin)
                     wire_length = 0
