@@ -237,7 +237,7 @@ def dijkstras(blocks, initial_node, goals):
                             visited[newX][newY][k] = True
 
     for goal in goals:
-        visited[goal[0]][goal[1]][2] = True
+        visited[goal[0]][goal[1]][1] = True
 
     for i in range(len(visited)):
         for j in range(len(visited[0])):
