@@ -528,37 +528,38 @@ def dijkstras(blocks, initial_node, goals):
                             if is_valid(blocks, current_node[0], current_node[1]-1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]-1][current_node[2]]):
                                 continue
 
+                            # Put the repeater in the correct direction
                             if next_node[1] - current_node[1] == 1:
                                 blocks[current_node[0]][current_node[1]][current_node[2]
                                                                          ].block_type = REPEATER_EAST
-                                blocks[current_node[0]][current_node[1]
-                                                        ][current_node[2]].id = 2
                             elif next_node[1] - current_node[1] == -1:
                                 blocks[current_node[0]][current_node[1]][current_node[2]
                                                                          ].block_type = REPEATER_WEST
-                                blocks[current_node[0]][current_node[1]
-                                                        ][current_node[2]].id = 2
+
+                            # Assign the ID
+                            blocks[current_node[0]][current_node[1]
+                                                    ][current_node[2]].id = blocks[current_node[0]][current_node[1]][current_node[2]].id
+
                             # we put a repeater here, continue on
                             prev_nodes.append(current_node)
-                            coord = next_node
+                            current_node = next_node
                             wire_length = 1
                             break
                         if next_node[1] == current_node[1] and current_node[1] == prev_node[1]:
-                            if is_valid(blocks, current_node[0], current_node[1]+1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]+1][current_node[2]]):
+                            if is_valid(blocks, current_node[0]+1, current_node[1], current_node[2]) and is_redstone_ish(blocks[current_node[0]+1][current_node[1]][current_node[2]]):
                                 continue
-                            if is_valid(blocks, current_node[0], current_node[1]-1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]-1][current_node[2]]):
+                            if is_valid(blocks, current_node[0]-1, current_node[1], current_node[2]) and is_redstone_ish(blocks[current_node[0]-1][current_node[1]][current_node[2]]):
                                 continue
 
                             if next_node[0] - current_node[0] == 1:
                                 blocks[current_node[0]][current_node[1]][current_node[2]
                                                                          ].block_type = REPEATER_SOUTH
-                                blocks[current_node[0]][current_node[1]
-                                                        ][current_node[2]].id = 2
                             elif next_node[0] - current_node[0] == -1:
                                 blocks[current_node[0]][current_node[1]][current_node[2]
                                                                          ].block_type = REPEATER_NORTH
-                                blocks[current_node[0]][current_node[1]
-                                                        ][current_node[2]].id = 2
+
+                            blocks[current_node[0]][current_node[1]
+                                                    ][current_node[2]].id = blocks[current_node[0]][current_node[1]][current_node[2]].id
                             prev_nodes.append(current_node)
                             current_node = next_node
                             wire_length = 1
