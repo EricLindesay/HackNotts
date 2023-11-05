@@ -2,7 +2,7 @@
 module counter(clk,count);
   //define input and output ports
   input clk;
-  output reg [2:0] count;
+  output reg [1:0] count;
   //always block will be executed at each and every positive edge of the clock
   always@(posedge clk) 
   begin
