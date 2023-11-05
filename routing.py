@@ -132,7 +132,7 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         dijkstras(blocks, start, goals)
 
     test_via_ups(blocks)
-    # populate_repeaters(blocks, requires_repeaters)
+    populate_repeaters(blocks, requires_repeaters)
     check_redstone_closeness(blocks)
 
     print_blocks(blocks, 1)
@@ -505,70 +505,9 @@ def dijkstras(blocks, initial_node, goals):
                 wire_length += 1
                 # The wire is now too long
                 if wire_length >= 15:
-                    # Loop forwards until you can place a repeate
-                    while len(prev_nodes) >= 2:
-                        # If its redstone, replace it with air
-                        if blocks[current_node[0]][current_node[1]][current_node[2]].block_type == REDSTONE:
-                            blocks[current_node[0]][current_node[1]
-                                                    ][current_node[2]].block_type = -1
-                            blocks[current_node[0]][current_node[1]
-                                                    ][current_node[2]].id = -1
-
-                        # Step back one
-                        next_node = current_node
-                        current_node = prev_nodes[-1]
-                        prev_node = prev_nodes[-2]
-
-                        prev_nodes = prev_nodes[:-1]  # remove the last node
-
-                        # Can we put a repeater here?
-                        if next_node[0] == current_node[0] and current_node[0] == prev_node[0]:
-                            # Don't allow T junctions
-                            if is_valid(blocks, current_node[0], current_node[1]+1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]+1][current_node[2]]):
-                                continue
-                            if is_valid(blocks, current_node[0], current_node[1]-1, current_node[2]) and is_redstone_ish(blocks[current_node[0]][current_node[1]-1][current_node[2]]):
-                                continue
-
-                            # Put the repeater in the correct direction
-                            if next_node[1] - current_node[1] == 1:
-                                blocks[current_node[0]][current_node[1]][current_node[2]
-                                                                         ].block_type = REPEATER_EAST
-                            elif next_node[1] - current_node[1] == -1:
-                                blocks[current_node[0]][current_node[1]][current_node[2]
-                                                                         ].block_type = REPEATER_WEST
-
-                            # Assign the ID
-                            blocks[current_node[0]][current_node[1]
-                                                    ][current_node[2]].id = blocks[current_node[0]][current_node[1]][current_node[2]].id
-
-                            # we put a repeater here, continue on
-                            prev_nodes.append(current_node)
-                            current_node = next_node
-                            wire_length = 1
-                            break
-                        if next_node[1] == current_node[1] and current_node[1] == prev_node[1]:
-                            if is_valid(blocks, current_node[0]+1, current_node[1], current_node[2]) and is_redstone_ish(blocks[current_node[0]+1][current_node[1]][current_node[2]]):
-                                continue
-                            if is_valid(blocks, current_node[0]-1, current_node[1], current_node[2]) and is_redstone_ish(blocks[current_node[0]-1][current_node[1]][current_node[2]]):
-                                continue
-
-                            if next_node[0] - current_node[0] == 1:
-                                blocks[current_node[0]][current_node[1]][current_node[2]
-                                                                         ].block_type = REPEATER_SOUTH
-                            elif next_node[0] - current_node[0] == -1:
-                                blocks[current_node[0]][current_node[1]][current_node[2]
-                                                                         ].block_type = REPEATER_NORTH
-
-                            blocks[current_node[0]][current_node[1]
-                                                    ][current_node[2]].id = blocks[current_node[0]][current_node[1]][current_node[2]].id
-                            prev_nodes.append(current_node)
-                            current_node = next_node
-                            wire_length = 1
-                            break
-
-                    # if type_id not in requires_repeaters:
-                    #     requires_repeaters.append(initial_node + [1])
-                    # wire_length = 0
+                    if type_id not in requires_repeaters:
+                        requires_repeaters.append(initial_node + [1])
+                    wire_length = 0
 
             prev_nodes.append(current_node)
             current_node = next_node
