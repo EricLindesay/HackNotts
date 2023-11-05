@@ -14,7 +14,7 @@ from parse_input import read_input
 
 # Get the gates we need - put this in a nxn grid (as best as possible)
 LAYER_SIZE = 3
-PADDING_X = 3
+PADDING_X = 2
 GAP = 7
 WIRE_LENGTH = 10
 
@@ -140,43 +140,15 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     test_via_ups(blocks)
     print("Start to populate repeaters")
     # print(requires_repeaters)
-    print_blocks(blocks, 1)
-    print_blocks(blocks, 2)
     populate_repeaters(blocks, requires_repeaters)
     check_redstone_closeness(blocks)
 
     print_blocks(blocks, 1)
     print_blocks(blocks, 2)
 
-    for i in range(len(blocks)):
-        for j in range(len(blocks[0])):
-            if blocks[i][j][1].block_type == REDSTONE:
-                if blocks[i][j][1].direction == [0, 0]:
-                    print(1, end='')
-                else:
-                    print(0, end='')
-            else:
-                print(" ", end='')
-        print()
-
-    return blocks
-
 
 def populate_repeaters(blocks, requires_repeaters):
-    for i in range(len(blocks)):
-        for j in range(len(blocks[0])):
-            if blocks[i][j][1].block_type == REDSTONE:
-                if blocks[i][j][1].direction == [0, 0]:
-                    print(1, end='')
-                else:
-                    print(0, end='')
-            else:
-                print(" ", end='')
-        print()
-    print(requires_repeaters)
-
     # Go through the list of repeaters.
-    print(requires_repeaters)
     num_repeaters = 0
     for repeater in requires_repeaters:
         print(repeater)
@@ -185,12 +157,10 @@ def populate_repeaters(blocks, requires_repeaters):
         prev_wire = []
 
         next_wire = []
-        print(horizontal_directions)
         for direction in horizontal_directions:
             newX = coord[0] + direction[0]
             newY = coord[1] + direction[1]
             newZ = coord[2]
-            print(newX, newY, newZ)
             if is_valid(blocks, newX, newY, newZ) and is_redstone_ish(blocks[newX][newY][newZ]):
                 next_wire = [newX, newY, newZ]
                 break
@@ -200,11 +170,9 @@ def populate_repeaters(blocks, requires_repeaters):
         # new_next = [coord[0] + dir_vect[0],
         #             coord[1] + dir_vect[1], coord[2]]
 
-        print("C1: ", coord, blocks[coord[0]][coord[1]][coord[2]])
         prev_wire.append(coord)
         coord = next_wire
         next_wire = None
-        print("C2: ", coord, blocks[coord[0]][coord[1]][coord[2]])
 
         while True:
             if not coord:
@@ -218,9 +186,7 @@ def populate_repeaters(blocks, requires_repeaters):
                 print(block)
                 break
             if block.block_type not in [REDSTONE]:  # probs gaate input
-                print(f"\t stop because we found a {block}")
                 break
-            print("\tIts redstone, yay!")
 
             dir_vect = blocks[coord[0]
                               ][coord[1]][coord[2]].direction
@@ -230,7 +196,6 @@ def populate_repeaters(blocks, requires_repeaters):
             next_wire = new_next
             wire_length += 1
             if wire_length >= WIRE_LENGTH:
-                print(f"Wire >= {WIRE_LENGTH}")
                 # loop backwards until you find a balid position for a repeaty
                 while prev_wire:
                     # go to this previous wire
@@ -247,25 +212,18 @@ def populate_repeaters(blocks, requires_repeaters):
                     # Make sure the x or y coordinates of each of these wires are the same
                     if next_wire[0] == coord[0] and coord[0] == last_wire[0]:
                         # repeate
-                        print("top")
-                        print(is_valid(blocks, coord[0]+1, coord[1], coord[2]),
-                              is_redstone_ish(blocks[coord[0]+1][coord[1]][coord[2]]))
                         if is_valid(blocks, coord[0]+1, coord[1], coord[2]) and is_redstone_ish(blocks[coord[0]+1][coord[1]][coord[2]]):
                             continue
-                        print(is_valid(blocks, coord[0]-1, coord[1], coord[2]),
-                              is_redstone_ish(blocks[coord[0]-1][coord[1]][coord[2]]))
                         if is_valid(blocks, coord[0]-1, coord[1], coord[2]) and is_redstone_ish(blocks[coord[0]-1][coord[1]][coord[2]]):
                             continue
 
                         t_direction = blocks[coord[0]
                                              ][coord[1]][coord[2]].direction
                         if t_direction[1] == 1:
-                            print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif t_direction[1] == -1:
-                            print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
@@ -276,13 +234,8 @@ def populate_repeaters(blocks, requires_repeaters):
                         wire_length = 1
                         break
                     if next_wire[1] == coord[1] and coord[1] == last_wire[1]:
-                        print("bottom")
-                        print(is_valid(blocks, coord[0], coord[1]+1, coord[2]),
-                              is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]))
                         if is_valid(blocks, coord[0], coord[1]+1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]+1][coord[2]]):
                             continue
-                        print(is_valid(blocks, coord[0], coord[1]-1, coord[2]),
-                              is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]))
                         if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
                             continue
 
@@ -292,12 +245,10 @@ def populate_repeaters(blocks, requires_repeaters):
                             print("dfoijdfaoifj")
                             exit(1)
                         if t_direction[0] == 1:
-                            print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_NORTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif t_direction[0] == -1:
-                            print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_SOUTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
@@ -316,14 +267,9 @@ def populate_repeaters(blocks, requires_repeaters):
             new_next = [next_wire[0] + dir_vect[0],
                         next_wire[1] + dir_vect[1], next_wire[2]]
 
-            print(block, dir_vect, blocks[new_next[0]]
-                  [new_next[1]][new_next[2]])
-
             prev_wire.append(coord)
             coord = next_wire
             next_wire = new_next
-        print(num_repeaters)
-    print(num_repeaters)
 
 
 def is_output_ish(block):
@@ -344,7 +290,7 @@ def test_via_ups(blocks):
                         newX = i + direction[0]
                         newY = j + direction[1]
                         newZ = k
-                        if is_valid(blocks, newX, newY, newZ) and blocks[newX][newY][newZ].block_type == REDSTONE:
+                        if is_valid(blocks, newX, newY, newZ) and is_redstone_ish(blocks[newX][newY][newZ].block_type):
                             red_neighbours += 1
                     if red_neighbours >= 2:
                         raise ValueError("There is redstone through a VIA_UP")
