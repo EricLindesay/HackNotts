@@ -257,26 +257,17 @@ def populate_repeaters(blocks, requires_repeaters):
                         if is_valid(blocks, coord[0]-1, coord[1], coord[2]) and is_redstone_ish(blocks[coord[0]-1][coord[1]][coord[2]]):
                             continue
 
-                        print(blocks[coord[0]][coord[1]][coord[2]].direction)
-                        if direction[1] == 1:
+                        t_direction = blocks[coord[0]
+                                             ][coord[1]][coord[2]].direction
+                        if t_direction[1] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_NORTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[1] == -1:
+                        elif t_direction[1] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_SOUTH
-                            blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[0] == 1:
-                            print("\t\tPlace")
-                            blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_WEST
-                            blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[0] == -1:
-                            print("\t\tPlace")
-                            blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         num_repeaters += 1
 
@@ -295,23 +286,17 @@ def populate_repeaters(blocks, requires_repeaters):
                         if is_valid(blocks, coord[0], coord[1]-1, coord[2]) and is_redstone_ish(blocks[coord[0]][coord[1]-1][coord[2]]):
                             continue
 
-                        print(blocks[coord[0]][coord[1]][coord[2]].direction)
-                        if direction[0] == 1:
-                            print("\t\tPlace")
-                            blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_NORTH
-                            blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[0] == -1:
-                            print("\t\tPlace")
-                            blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_SOUTH
-                            blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[1] == 1:
+                        t_direction = blocks[coord[0]
+                                             ][coord[1]][coord[2]].direction
+                        if t_direction[1] == 1:
+                            print("dfoijdfaoifj")
+                            exit(1)
+                        if t_direction[0] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[1] == -1:
+                        elif t_direction[0] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_WEST
