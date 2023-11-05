@@ -271,12 +271,12 @@ def populate_repeaters(blocks, requires_repeaters):
                         elif direction[0] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_EAST
+                                                       ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif direction[0] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
-                                                       ].block_type = REPEATER_WEST
+                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         num_repeaters += 1
 
@@ -296,22 +296,22 @@ def populate_repeaters(blocks, requires_repeaters):
                             continue
 
                         print(blocks[coord[0]][coord[1]][coord[2]].direction)
-                        if direction[1] == 1:
+                        if direction[0] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_NORTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[1] == -1:
+                        elif direction[0] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_SOUTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[0] == 1:
+                        elif direction[1] == 1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
-                        elif direction[0] == -1:
+                        elif direction[1] == -1:
                             print("\t\tPlace")
                             blocks[coord[0]][coord[1]][coord[2]
                                                        ].block_type = REPEATER_WEST
