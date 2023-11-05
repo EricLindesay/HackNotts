@@ -1,3 +1,4 @@
+import random
 import math
 
 from classes import *
@@ -12,6 +13,9 @@ from parse_input import read_input
 # Get the number of outputs
 
 # Get the gates we need - put this in a nxn grid (as best as possible)
+LAYER_SIZE = 3
+PADDING_X = 3
+GAP = 7
 
 
 class Block:
@@ -26,26 +30,25 @@ class Block:
 
 
 def initialise_blocks(nodes, inputs, outputs):
-    padding_x = 3
     blocks = []
     n: int = ceil(sqrt(len(nodes)))
     input_width = len(inputs) * 2 - 1
     output_width = len(outputs) * 2 - 1
-    gate_width = n * 3 + (n - 1) * 5
-    width = max(input_width, output_width, gate_width) + 2 * padding_x
+    gate_width = n * 3 + (n - 1) * GAP
+    width = max(input_width, output_width, gate_width) + 2 * PADDING_X
     # one for input, one for output. We want 5 gap between them
     # n * 4, they are 4 long, need 5 gap between them
 
     actual_nodes = n
     while abs(len(nodes) - actual_nodes) <= 0:
         actual_nodes -= 1
-    height = 2 + actual_nodes * 4 + (actual_nodes + 1) * 5
+    height = 2 + actual_nodes * 4 + (actual_nodes) * GAP
 
     for i in range(0, height):
         i_l = []
         for j in range(0, width):
             j_l = []
-            for k in range(0, 3):
+            for k in range(0, LAYER_SIZE):
                 j_l.append(Block(-1, -1, -1))
             i_l.append(j_l)
         blocks.append(i_l)
@@ -53,16 +56,16 @@ def initialise_blocks(nodes, inputs, outputs):
     step_size = width // len(inputs)
     start_offset = step_size // 2
     for ind, input in enumerate(inputs):
-        blocks[0][ind * step_size + start_offset][0] = Block(input.id, INPUT, input)
-        blocks[0][ind * step_size + start_offset][1] = Block(input.wire * -1, INPUT, input)
+        blocks[0][ind * step_size +
+                  start_offset][0] = Block(input.id, INPUT, input)
+        blocks[0][ind * step_size +
+                  start_offset][1] = Block(input.wire * -1, INPUT, input)
 
     return blocks
 
 
 def add_gates(blocks, nodes):
     # Gates are 3x4
-    padding_x = 3
-
     n: int = ceil(sqrt(len(nodes)))  # this is the grid size, e.g. 2x2 grid
 
     # Do a 5 block gap between each important thing
@@ -70,10 +73,10 @@ def add_gates(blocks, nodes):
     for i, node in enumerate(nodes):
         divd: int = i // n  # the x coord
         modd: int = i % n  # the y coord
-        start_x = divd * 9 + 6
+        start_x = divd * (4 + GAP) + 6
         end_x = start_x + 4  # the gates are 4 long
 
-        start_y = modd * 8 + padding_x
+        start_y = modd * (3 + GAP) + PADDING_X
         end_y = start_y + 3  # the gates are 3 wide
 
         # +4 because the things are 4 long, + 1 for rounding error
@@ -109,8 +112,10 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
     start_offset = step_size // 2
     print(step_size, start_offset)
     for i, output in enumerate(outputs):
-        blocks[len(blocks) - 1][i * step_size + start_offset][0] = Block(output.id, OUTPUT, output)
-        blocks[len(blocks) - 1][i * step_size + start_offset][1] = Block(output.wire, OUTPUT, output)
+        blocks[len(blocks) - 1][i * step_size +
+                                start_offset][0] = Block(output.id, OUTPUT, output)
+        blocks[len(blocks) - 1][i * step_size +
+                                start_offset][1] = Block(output.wire, OUTPUT, output)
 
     print_blocks(blocks, 1)
     # dijkstras(blocks, [0, 0], [[6,2], [6,8]])
@@ -129,8 +134,8 @@ def route(nodes: list[Node], inputs: list[Input], outputs: list[Output]):
         print(f"Doing dijkstra on {node}: {start}, {goals}")
         dijkstras(blocks, start, goals)
 
-    print_blocks(blocks, 1)
     return blocks
+
 
 def print_blocks(blocks, layer=0):
     for i in blocks:
@@ -179,15 +184,13 @@ def dijkstras(blocks, initial_node, goals):
                range(len(blocks))]
 
     to_visit = len(visited) * len(visited[0]) * len(visited[0][0])
-    directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
+    directions = [[1, 0, 0], [-1, 0, 0], [0, 1, 0],
+                  [0, -1, 0], [0, 0, 1], [0, 0, -1]]
 
     # Block off redstone and other pings
-    print(initial_node, goals, blocks[initial_node[0]][initial_node[1]][1])
     for i in range(len(blocks)):
         for j in range(len(blocks[0])):
             # Block off the other inputs
-            if blocks[i][j][1].id != -1:
-                print(f"{i}, {j}, 1 : {blocks[i][j][1]}")
 
             if i == initial_node[0] and j == initial_node[1]:
                 # You don't want to block yourself off
@@ -212,8 +215,6 @@ def dijkstras(blocks, initial_node, goals):
             # blockable_type: bool = (dont_block_same_id or blocks[i][j][1].block_type == INPUT)
             # if blockable_type:
 
-            print(f"\tDENIED")
-
             visited[i][j][0] = True
             to_visit -= 1
             for direction in directions:
@@ -230,7 +231,6 @@ def dijkstras(blocks, initial_node, goals):
                 blocks_k = k + 1
                 # Block off the other redstone
                 if blocks[i][j][blocks_k].block_type in [REDSTONE, VIA_UP, VIA_DOWN]:
-                    print(f"Redstone blocking {i} {j} {k}")
                     visited[i][j][k] = True
                     to_visit -= 1
                     for direction in directions:
@@ -241,8 +241,7 @@ def dijkstras(blocks, initial_node, goals):
                             to_visit -= 1
 
     distance[initial_node[0]][initial_node[1]][0] = 0
-    for v in visited:
-        print(v)
+
     # Do dijkstras
     while True:
         min_node = []  # 0, 0, 0
@@ -271,20 +270,16 @@ def dijkstras(blocks, initial_node, goals):
                 distance[newX][newY][newZ] = min(distance[min_node[0]][min_node[1]][min_node[2]] + 1,
                                                  distance[newX][newY][newZ])
 
-    for d in distance:
-        print(d)
-
-    for v in visited:
-        print(v)
     # A list of coordinates for each goal
 
     # Now backtrack from the goal to try to get the best route, then put the redstone on that route
     # if elevation changes, make sure to mark it as a VIA
     # We prefer straight lines
-    requires_repeaters = []  # a list of coordinates. These coordinates are initial nodes which you should step through
-                             # Step through this node until you find a place where you require a repeater
-                             # Then step backwards until you find a place to put it
-                             # Then continue stepping through until you find another place to put the repeater, or the end
+    # a list of coordinates. These coordinates are initial nodes which you should step through
+    requires_repeaters = []
+    # Step through this node until you find a place where you require a repeater
+    # Then step backwards until you find a place to put it
+    # Then continue stepping through until you find another place to put the repeater, or the end
 
     for goal in goals:
         wire_length: int = 0
@@ -323,17 +318,19 @@ def dijkstras(blocks, initial_node, goals):
             # If you go down, set it as a via instead
 
             # Work out whether this is a via
-            print(f"Update block {next_node}")
             type_id = blocks[initial_node[0]][initial_node[1]][1].id
             if current_node[0] == next_node[0] and current_node[1] == next_node[1] and current_node[2] != next_node[2]:
                 if current_node[2] > next_node[2]:
-                    blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_UP
+                    blocks[next_node[0]][next_node[1]
+                                         ][next_node[2] + 1].block_type = VIA_UP
                 if current_node[2] < next_node[2] and not (next_node[0] == goal[0] and next_node[1] == goal[1]):
-                    blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = VIA_DOWN
+                    blocks[next_node[0]][next_node[1]
+                                         ][next_node[2] + 1].block_type = VIA_DOWN
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 1
                 wire_length = 0
             else:
-                blocks[next_node[0]][next_node[1]][next_node[2] + 1].block_type = REDSTONE
+                blocks[next_node[0]][next_node[1]
+                                     ][next_node[2] + 1].block_type = REDSTONE
                 blocks[next_node[0]][next_node[1]][next_node[2] + 1].id = 0
                 wire_length += 1
                 if wire_length >= 15:
@@ -343,6 +340,14 @@ def dijkstras(blocks, initial_node, goals):
 
             current_node = next_node
 
+    print("Layer 1")
+    print_blocks(blocks, 1)
+    print("Layer 2")
+    print_blocks(blocks, 2)
+    # print("Layer 3")
+    # print_blocks(blocks, 3)
+
+    return
 
     # Go through the list of repeaters.
     for repeater in requires_repeaters:
@@ -403,10 +408,12 @@ def dijkstras(blocks, initial_node, goals):
                     if next_wire[0] == coord[0] and coord[0] == last_wire[0]:
                         # repeate
                         if next_wire[1] - coord[1] == 1:
-                            blocks[coord[0]][coord[1]][coord[2]].block_type = REPEATER_EAST
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_EAST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif next_wire[1] - coord[1] == -1:
-                            blocks[coord[0]][coord[1]][coord[2]].block_type = REPEATER_WEST
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_WEST
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         prev_wire.append(coord)
                         coord = next_wire
@@ -414,17 +421,20 @@ def dijkstras(blocks, initial_node, goals):
                         break
                     if next_wire[1] == coord[1] and coord[1] == last_wire[1]:
                         if next_wire[0] - coord[0] == 1:
-                            blocks[coord[0]][coord[1]][coord[2]].block_type = REPEATER_SOUTH
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_SOUTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         elif next_wire[0] - coord[0] == -1:
-                            blocks[coord[0]][coord[1]][coord[2]].block_type = REPEATER_NORTH
+                            blocks[coord[0]][coord[1]][coord[2]
+                                                       ].block_type = REPEATER_NORTH
                             blocks[coord[0]][coord[1]][coord[2]].id = 2
                         prev_wire.append(coord)
                         coord = next_wire
                         wire_length = 1
                         break
 
-            horizontal_directions = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+            horizontal_directions = [[1, 0, 0], [
+                0, 1, 0], [-1, 0, 0], [0, -1, 0]]
             next_wire = []
             for direction in horizontal_directions:
                 newX = coord[0] + direction[0]
@@ -456,6 +466,7 @@ def dijkstras(blocks, initial_node, goals):
 def is_redstone_ish(block):
     return block.block_type == REDSTONE or block.block_type == VIA_UP or block.block_type == VIA_DOWN
 
+
 def is_valid(distance, x, y, z):
     return not (x >= len(distance) or x < 0 or y >= len(distance[0]) or y < 0 or z >= len(distance[0][0]) or z < 0)
 
@@ -464,4 +475,5 @@ if __name__ == "__main__":
     nodes = read_input().read_gates("./yosys/opt6.json")
     inputs = read_input().read_inputs("./yosys/opt6.json")
     outputs = read_input().read_outputs("./yosys/opt6.json")
+    random.shuffle(nodes)
     route(nodes, inputs, outputs)
