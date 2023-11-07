@@ -1,5 +1,33 @@
 # HackNotts
 
+## Contents
+[Description/Background](#descriptionbackground)
+- [Inspiration](#inspiration)
+- [Result](#result)
+[Detailed Description](#detailed-description)
+- [Technology Used](#technology-used)
+    - [Yosys](#yosys)
+    - [McSchematic](#mcschematic)
+- [Overview](#overview)
+[Difficulties](#difficulties)
+- [Placing the blocks](#placing-the-blocks)
+- [World Edit](#world-edit)
+- [Coordinate system](#coordinate-system)
+- [Repeaters](#repeaters)
+- [Propagation Delay](#propagation-delay)
+- [Sleep deprivation](#sleep-deprivation)
+[Known Issues and (Possible) Solutions](#known-issues-and-possible-solutions)
+- [No rotation](#no-rotation)
+- [random.shuffle](#randomshuffle)
+- [Speed](#speed)
+    - [Code Limitations](#code-limitations)
+    - [Minecraft Limitations](#minecraft-limitations)
+- [Layer Depth](#layer-depth)
+- [Gate Dimension Limitations](#gate-dimension-limitations)
+- [Gaps between Gates](#gaps-between-gates)
+- [Bugs](#bugs)
+[Conclusion](#conclusion)
+
 ## Description/Background
 This project was developed by the three of us in 24 hours for [HackNotts '84](https://www.hacknotts.com), a hackathon hosted by the Univeristy of Nottingham.
 The aim of this project was to convert [Verilog](https://en.wikipedia.org/wiki/Verilog) HDL files into a schematic which can be pasted into the game Minecraft and was proposed by one of the three of us, Matthew. Something important to us was ensuring that the project used blocks only available in Vanilla Minecraft so anyone could use it without mods (excluding World Edit which is required to paste the schematic into the world).
@@ -129,12 +157,12 @@ This would be quite simple to solve. The routing code will be able to be modifie
 
 The largest issue with adding more layers would be how much extra time it would take to route the wires, meaning that any circuit will be infeasible given enough layers (due to time constraints) as mentioned in the [#speed] section.
 
-### Minecraft logic gate dimension limitations
+### Gate Dimension Limitations
 Our code currently assumes that logic gates can fit in a 3x4 space and has no easy way to change these values without changing the code. This is because all of our logic gates do fit in that range, so we don't need to spend time and effort implementing something which can do variable sized.
 
 There are two solutions to this, one solution is to not worry about it. Technically, any new logic gate you create can just extend vertically upwards and do more logic up there if needed. All that matters is the inputs and outputs are within a 3x4 horizontal plane. This isn't a very nice solution though. The other solution would be to make it allow for variations in size. A simple way for this is to just find the largest gate and assume everything is that size and deal with it when it is required.
 
-### Gate gap size
+### Gaps between Gates
 A large issue with the code is that the space left between each logic gate is not dynamically changed. This can result in scenarios where you try to build a circuit but it can't find a solution. At one point, we were trying to build a 3-bit counter using our program and a gap size of 5, however we couldn't get a solution. We then increased the gap size to 7 which allowed the circuits more room to breathe which then gave us an output.
 
 As a general rule, if the code is failing due to the redstone circuits error (`AssertionError("Redstone too close together and clashing")`), increasing the gap between logic gates is probably the best thing to try initially.
